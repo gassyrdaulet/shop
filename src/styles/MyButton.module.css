@@ -1,0 +1,38 @@
+.MyButton {
+  position: relative;
+  background-color: #5288c1;
+  padding: 10px;
+  border-radius: 3px;
+  user-select: none;
+  cursor: pointer;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  border: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+.MyButton:disabled {
+  color: rgb(151, 151, 151);
+  background-color: #55708e;
+  cursor: auto;
+}
+.MyButton:active:disabled {
+  background-color: #55708e;
+}
+.MyButton:active {
+  background-color: #3a5a7c;
+}
+.Loading {
+  color: transparent;
+}
+.Loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -8px;
+  visibility: hidden;
+}
+.LoaderVisible {
+  visibility: visible;
+}

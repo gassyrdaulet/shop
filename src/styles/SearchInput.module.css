@@ -1,0 +1,10 @@
+.SearchInput {
+  width: 100%;
+  border-radius: 3px;
+  border: 1px solid rgb(181, 181, 181);
+  padding: 6px 10px;
+}
+.SearchInput:focus {
+  outline: none;
+  box-shadow: 0 0 4px rgb(73, 160, 253);
+}

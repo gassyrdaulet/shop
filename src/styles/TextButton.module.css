@@ -1,0 +1,9 @@
+.Link {
+  font-size: 0.8rem;
+  user-select: none;
+  cursor: pointer;
+  color: #0645ad;
+}
+.Link:hover {
+  text-decoration: underline;
+}

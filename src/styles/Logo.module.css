@@ -1,0 +1,24 @@
+.mainWrapper {
+  padding: 2px;
+  width: 47px;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  border: 2px solid rgb(29, 183, 29);
+  border-radius: 50%;
+  user-select: none;
+  margin: 3px;
+  min-width: 47px;
+  min-height: 47px;
+  background-color: white;
+}
+.Word {
+  color: red;
+  rotate: -15deg;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
+}

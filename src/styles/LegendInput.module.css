@@ -1,0 +1,55 @@
+.LegendInputWrapper {
+  position: relative;
+  margin-top: 10px;
+  width: 100%;
+  user-select: none;
+}
+.LegendInput {
+  min-height: 50px;
+  border: 2px solid rgb(156, 156, 156);
+  border-radius: 3px;
+  padding: 5px 10px;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #2c2828;
+  caret-color: rgb(73, 160, 253);
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+  transition: 0.3s ease;
+  background-color: #f8f8f8;
+}
+.LegendInput:focus {
+  outline: none;
+  border: 2px solid rgb(73, 160, 253);
+}
+.LegendInput:focus + .LegendTitle {
+  color: rgb(73, 160, 253);
+}
+.LegendTitle {
+  color: rgb(156, 156, 156);
+  font-weight: 500;
+  position: absolute;
+  font-size: 13px;
+  left: 10px;
+  top: -8px;
+  z-index: 1;
+  padding: 0 4px;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+}
+.LegendInput::placeholder {
+  font-weight: 400;
+  color: #3e3e3e;
+}
+.LegendInput:disabled {
+  border: 2px solid #bfbfbf;
+}
+.LegendInput::placeholder {
+  color: #bfbfbf;
+}
+.LegendInput:disabled,
+.LegendInput:disabled + .LegendTitle {
+  color: #bfbfbf;
+}

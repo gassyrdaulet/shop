@@ -1,0 +1,66 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+html {
+  position: relative;
+  font-family: "Inter", sans-serif;
+}
+*::-webkit-scrollbar {
+  position: absolute;
+  width: 5px;
+  background-color: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(130, 130, 130);
+  border-radius: 10px;
+}
+hr {
+  margin: 10px 0;
+  height: 2px;
+  width: 100%;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+p {
+  font-size: 1rem;
+}
+.marginRight10px {
+  margin-right: 10px;
+}
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+.Body {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #eeeeee;
+}
+.pageWrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.hideScroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
