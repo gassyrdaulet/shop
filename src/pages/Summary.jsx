@@ -1,13 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
-import { BsArrowLeftCircle } from "react-icons/bs";
-import { AiOutlineCheckCircle } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
 import cl from "../styles/Goods.module.css";
 
 function Summary() {
-  const navigate = useNavigate();
-  const [processLoading, setProcessLoading] = useState(false);
-
   const buttons = [];
   const buttons2 = [];
 

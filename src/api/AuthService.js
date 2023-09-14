@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "../config/config.json";
 import Cookies from "universal-cookie";
 
+// ("scp -r ./build/* /var/www/domper.kz/html");
 const { SERVER_URL, TOKEN_NAME } = config;
 const cookies = new Cookies();
 let alert;
