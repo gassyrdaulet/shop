@@ -43,7 +43,7 @@ function GroupRow({ className, children, setGroup, id, fetch }) {
                 isLoading={deleteGroupLoading}
                 onClick={() =>
                   deleteGroup({
-                    setDeleteGroupLoading,
+                    setProcessLoading: setDeleteGroupLoading,
                     id,
                     update: () => {
                       fetch();
@@ -83,7 +83,7 @@ function GroupRow({ className, children, setGroup, id, fetch }) {
                   });
                 }}
                 isLoading={editGroupLoading}
-                disabled={deleteGroupLoading}
+                disabled={deleteGroupLoading || editGroupLoading}
               />
             </div>
           </div>
