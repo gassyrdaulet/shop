@@ -147,7 +147,7 @@ export const newGroup = async ({
 export const newRelation = async ({
   setNewRelationLoading,
   code,
-  good,
+  goods,
   next,
 }) => {
   setNewRelationLoading(true);
@@ -155,7 +155,7 @@ export const newRelation = async ({
   axios
     .post(
       `${SERVER_URL}/api/goods/newrelation`,
-      { code, good },
+      { code, goods },
       {
         headers: {
           [TOKEN_NAME]: token,
@@ -313,7 +313,7 @@ export const editGroup = async ({
 
 export const editRelation = async ({
   setProcessLoading,
-  good,
+  goods,
   relationId,
   next,
 }) => {
@@ -322,7 +322,7 @@ export const editRelation = async ({
   axios
     .post(
       `${SERVER_URL}/api/goods/editrelation`,
-      { good, relationId },
+      { goods, relationId },
       {
         headers: {
           [TOKEN_NAME]: token,

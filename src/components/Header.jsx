@@ -1,7 +1,6 @@
 import cl from "../styles/Header.module.css";
 import Logo from "./Logo";
 import {
-  BsFillClockFill,
   BsBoxArrowLeft,
   BsBox2Heart,
   BsTruck,
@@ -13,11 +12,7 @@ import {
   BsPersonGear,
   BsPencil,
 } from "react-icons/bs";
-import {
-  AiOutlinePlusCircle,
-  AiOutlineMinusCircle,
-  // AiOutlineInbox,
-} from "react-icons/ai";
+import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
 import { logout } from "../api/AuthService.js";
 import { useState } from "react";
@@ -88,10 +83,10 @@ function Header() {
       path: "/summaries",
       dropmenu: [
         {
-          icon: <BsFillClockFill />,
-          name: "Отчет",
-          onClick: () => navigate("/summaries/summary"),
-          path: "/summaries/summary",
+          icon: <BiUser />,
+          name: "По сотрудникам",
+          onClick: () => navigate("/summaries/usersummary"),
+          path: "/summaries/usersummary",
         },
       ],
     },

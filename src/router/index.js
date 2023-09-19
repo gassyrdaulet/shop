@@ -5,7 +5,7 @@ import NoOrg from "../pages/NoOrg";
 import ChangePassword from "../pages/ChangePassword";
 import ConfirmAccount from "../pages/ConfirmAccount";
 import Goods from "../pages/Goods";
-import Summary from "../pages/Summary";
+import UserSummary from "../pages/UserSummary";
 import NewGood from "../pages/NewGood";
 import EditGood from "../pages/EditGood";
 import Delivery from "../pages/Delivery";
@@ -38,7 +38,7 @@ export const userRoutes = [
     path: "/warehouse/inventory/details/:id",
     element: <InventoryDetails></InventoryDetails>,
   },
-  { path: "/summaries/summary", element: <Summary></Summary> },
+  { path: "/summaries/usersummary", element: <UserSummary></UserSummary> },
   { path: "/settings/:settingstype", element: <Settings></Settings> },
   { path: "/", element: <Navigate to="/main"></Navigate> },
   { path: "/noorg", element: <Navigate to="/main"></Navigate> },
