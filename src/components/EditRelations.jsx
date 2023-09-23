@@ -12,6 +12,7 @@ import SearchInput from "./SearchInput";
 import Modal from "./Modal";
 import cl from "../styles/Goods.module.css";
 import Loading from "./Loading";
+import TextButton from "./TextButton";
 import LegendInput from "./LegendInput";
 import {
   deleteRelation,
@@ -41,10 +42,17 @@ function EditRelations() {
   const [fetchedGroups, setFetchedGroups] = useState([]);
   const [goods, setGoods] = useState([]);
   const [relations, setRelations] = useState([]);
+  const [sortById, setSortById] = useState(true);
   const navigate = useNavigate();
 
   const sortedRelations = useMemo(() => {
     try {
+      if (sortById) {
+        const sortedArray = [...relations].sort((a, b) => {
+          return -(a.id > b.id);
+        });
+        return sortedArray;
+      }
       const sortedArray = [...relations].sort((a, b) => {
         return a.code.localeCompare(b.code);
       });
@@ -52,7 +60,7 @@ function EditRelations() {
     } catch {
       return [];
     }
-  }, [relations]);
+  }, [relations, sortById]);
 
   const filteredRelations = useMemo(() => {
     try {
@@ -202,7 +210,10 @@ function EditRelations() {
           className={cl.TableMainWrapper}
           style={{ width: "100%", maxWidth: "100%", padding: 0 }}
         >
-          <div className={cl.tableWrapper} style={{ height: "inherit" }}>
+          <div
+            className={cl.tableWrapper}
+            style={{ height: "inherit", maxHeight: "100vh" }}
+          >
             {fetchLoading ? (
               <div className={cl.Center}>
                 <Loading which="gray" />
@@ -212,7 +223,13 @@ function EditRelations() {
                 <thead>
                   <tr>
                     <th>№</th>
-                    <th>ID</th>
+                    <th
+                      onClick={() => {
+                        setSortById(!sortById);
+                      }}
+                    >
+                      ID
+                    </th>
                     <th>Артикул</th>
                     <th>Товары</th>
                     <th></th>
@@ -238,7 +255,16 @@ function EditRelations() {
                             {relation.id}
                           </td>
                           <td style={{ minWidth: 100, textAlign: "center" }}>
-                            {relation.code}
+                            <a
+                              rel="noreferrer"
+                              href={"https://kaspi.kz/shop/p/-" + relation.code}
+                              target="_blank"
+                            >
+                              <TextButton
+                                text={relation.code}
+                                onClick={() => {}}
+                              />
+                            </a>
                           </td>
                           <td style={{ minWidth: 150, maxWidth: 250 }}>
                             {relation.goods.map((good, index) => {
@@ -486,6 +512,7 @@ function EditRelations() {
               </div>
               <p className={cl.NavigationGroupName}>{selectedGroup?.name}</p>
               <SearchInput
+                autoFocus={true}
                 placeholder="Поиск"
                 value={search}
                 setValue={setSearch}

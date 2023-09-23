@@ -1,10 +1,17 @@
 import { useMemo } from "react";
 import moment from "moment";
-import { BiCheckbox, BiCheckboxChecked } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import TextButton from "./TextButton";
 
-function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
+function Order({
+  index,
+  order,
+  checked,
+  handleMark,
+  status,
+  dateType,
+  orderStatus,
+}) {
   const navigate = useNavigate();
 
   const sum = useMemo(() => {
@@ -63,19 +70,7 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
       }}
       onClick={() => handleMark(order.id)}
     >
-      <td>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          {checked ? <BiCheckboxChecked size={32} /> : <BiCheckbox size={32} />}
-        </div>
-      </td>
+      <td style={{ textAlign: "center" }}>{index + 1}</td>
       <td style={{ minWidth: 150 }}>
         {goodsParsed}
         <TextButton

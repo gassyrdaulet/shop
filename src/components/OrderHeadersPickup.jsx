@@ -1,5 +1,3 @@
-import { BiCheckbox, BiCheckboxChecked } from "react-icons/bi";
-
 function OrderHeaders({ markAll, allMarked, unmarkAll, dateType, status }) {
   return (
     <tr
@@ -12,23 +10,7 @@ function OrderHeaders({ markAll, allMarked, unmarkAll, dateType, status }) {
         }
       }}
     >
-      <th>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
-        >
-          {allMarked ? (
-            <BiCheckboxChecked size={32} />
-          ) : (
-            <BiCheckbox size={32} />
-          )}
-        </div>
-      </th>
+      <th>№</th>
       <th>Товары</th>
       <th>Сумма</th>
       <th>Продавец</th>

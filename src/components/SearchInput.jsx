@@ -7,9 +7,11 @@ function SearchInput({
   className,
   type,
   inputMode,
+  autoFocus,
 }) {
   return (
     <input
+      autoFocus={autoFocus}
       type={type}
       className={cl.SearchInput + " " + className}
       value={value}

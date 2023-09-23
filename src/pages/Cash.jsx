@@ -162,6 +162,9 @@ function Cash() {
 
   useEffect(() => {
     setCashBoxModal(true);
+    setTimeout(() => {
+      setCashBoxModal(false);
+    }, 1500);
     getCashbox({ setCashboxLoading, setCashbox });
     getManagers({ setManagers, setManagersLoading });
     getOrders({ setOrdersLoading, setOrders, status: "pickup" });
@@ -428,6 +431,7 @@ function Cash() {
       disabled: processLoading,
       icon: <BiMinusCircle />,
       text: "Отмена",
+      color: "#FF7373",
       onClick: () => {
         if (window.confirm("Вы действительно хотите отменить эту продажу?")) {
           if (nowEditing) {
@@ -451,12 +455,14 @@ function Cash() {
     {
       disabled: processLoading || ordersLoading,
       icon: <BiArrowToRight />,
+      color: "#FFD140",
       text: "Отложка",
       onClick: () => setSetAsideModal(true),
     },
     {
       disabled: processLoading,
       icon: <BiMoney />,
+      color: "#4671D5",
       text: "Принять оплату",
       onClick: () => setPaymentModal(true),
     },
@@ -464,6 +470,7 @@ function Cash() {
       // disabled: goodsForSell.length === 0 || difference !== 0 || processLoading,
       icon: <BiCheckCircle />,
       text: "Продать",
+      color: "#39E639",
       onClick: async () => {
         if (nowEditing) {
           issueCash({
@@ -689,10 +696,13 @@ function Cash() {
           {buttons2.map((button) => {
             return (
               <button
+                style={{
+                  backgroundColor: button.color,
+                }}
                 disabled={button.disabled}
                 key={button.text}
                 onClick={button.onClick}
-                className={cl.OptionsButton}
+                className={cl.CashButton}
               >
                 {button.icon}
                 {button.text}
@@ -853,7 +863,7 @@ function Cash() {
           <div
             className={cl.tableWrapper}
             style={{
-              maxHeight: 350,
+              maxHeight: 280,
               backgroundColor: "#dedede",
               borderRadius: 5,
             }}
