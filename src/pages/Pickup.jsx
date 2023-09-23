@@ -483,7 +483,10 @@ function Pickup() {
               ""
             )}
           </div>
-          <div className={cl.tableWrapper} style={{ height: "inherit" }}>
+          <div
+            className={cl.tableWrapper}
+            style={{ height: "inherit", marginBottom: 50 }}
+          >
             {ordersLoading || finishedOrdersLoading ? (
               <div
                 style={{
