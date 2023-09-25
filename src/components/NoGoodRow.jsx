@@ -22,12 +22,22 @@ function NoGoodRow({ good, index, setGoods, goods, editable = true }) {
             ? 0
             : (value + "").replace("0", "")
           : value + "";
-        const result = parseInt(
-          (value2 + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
-        );
+        const result =
+          key === "discount.amount"
+            ? parseInt(
+                (value2 + "")
+                  .replace(/^0{2,}|^0.|[^-0-9/]/gim, "")
+                  .substring(0, 7)
+              )
+            : parseInt(
+                (value2 + "")
+                  .replace(/^0{2,}|^0.|[^0-9/]/gim, "")
+                  .substring(0, 7)
+              );
         const result2 = isNaN(result) ? 0 : result;
         if (key === "discount.amount") {
-          good["discount"].amount = result2 > 10000 ? 10000 : result2;
+          good["discount"].amount =
+            result2 > 100000 ? 100000 : result2 < -100000 ? -100000 : result2;
         } else if (key === "discount.type") {
           good["discount"].type = value;
         } else {
@@ -103,7 +113,7 @@ function NoGoodRow({ good, index, setGoods, goods, editable = true }) {
             inputMode="numeric"
             style={{
               width: "80%",
-              minWidth: "50px",
+              minWidth: "60px",
               height: "25px",
               textAlign: "end",
               padding: " 2px 5px",

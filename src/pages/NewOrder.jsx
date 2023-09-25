@@ -16,7 +16,7 @@ import NoPaymentHeaders from "../components/NoPaymentHeaders";
 import NoPaymentRow from "../components/NoPaymentRow";
 import useAuth from "../hooks/useAuth";
 import CheckBox from "../components/CheckBox";
-import { getManagers } from "../api/OrganizationService";
+import { getManagers, getOrgInfo } from "../api/OrganizationService";
 import { newOrder } from "../api/OrderService";
 
 function NewOrder() {
@@ -34,6 +34,8 @@ function NewOrder() {
   const [fetchedGroups, setFetchedGroups] = useState([]);
   const [goodsVisible, setGoodsVisible] = useState(false);
   const [goods, setGoods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [payment, setPayment] = useState([]);
   const [delivery, setDelivery] = useState({});
   const [discount, setDiscount] = useState({ amount: 0, type: "KZT" });
@@ -126,7 +128,7 @@ function NewOrder() {
   ];
   const buttons4 = [
     {
-      disabled: newOrderLoading,
+      disabled: newOrderLoading || paymentsLoading,
       icon: <BsPlusCircle />,
       text: "Добавить оплату",
       onClick: () => {
@@ -378,6 +380,15 @@ function NewOrder() {
   };
 
   useEffect(() => {
+    getOrgInfo({
+      setFetchLoading: setPaymentsLoading,
+      setData: () => {},
+      setValue: (key, v) => {
+        if (key === "paymentMethods") {
+          setPaymentMethods(v);
+        }
+      },
+    });
     getManagers({ setManagers, setManagersLoading });
     getGoodsAndGroups({
       setFetchLoading,
@@ -671,6 +682,7 @@ function NewOrder() {
                             index={index + 1}
                             paymentItem={item}
                             setFocusedInput={() => {}}
+                            paymentMethods={paymentMethods}
                           />
                         );
                       })}
@@ -920,7 +932,7 @@ function NewOrder() {
                           name: good.name,
                           price: good.price,
                           purchase: good.purchase,
-                          quantity: 0,
+                          quantity: 1,
                           discount: { amount: 0, type: "KZT" },
                           remainder: good.remainder,
                         });

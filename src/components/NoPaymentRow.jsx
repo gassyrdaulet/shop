@@ -8,6 +8,7 @@ function NoPaymentRow({
   payment,
   editable = true,
   setFocusedInput,
+  paymentMethods,
 }) {
   const deletePayment = () => {
     const temp = payment.filter((item) => {
@@ -59,11 +60,13 @@ function NoPaymentRow({
             handleChange(target.value, "method");
           }}
         >
-          <option value="cash">Наличка</option>
-          <option value="kaspiqr">Kaspi QR</option>
-          <option value="kaspigold">Kaspi GOLD</option>
-          <option value="kaspired">Kaspi RED</option>
-          <option value="card">Карта</option>
+          {paymentMethods.map((method) => {
+            return (
+              <option key={method.id} value={method.code}>
+                {method.name}
+              </option>
+            );
+          })}
         </select>
       </td>
       <td>

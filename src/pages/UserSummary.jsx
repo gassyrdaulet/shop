@@ -4,12 +4,13 @@ import cl from "../styles/Goods.module.css";
 import SearchInput from "../components/SearchInput";
 import Select from "../components/Select";
 import Button from "../components/Button";
-import { getManagers } from "../api/OrganizationService";
+import { getManagers, getOrgInfo } from "../api/OrganizationService";
 import { getFinishedOrders } from "../api/OrderService";
 import Loading from "../components/Loading";
 
 function UserSummary() {
   const [fecthLoading, setFetchLoading] = useState(false);
+  const [fetchedPaymentMethods, setFetchedPaymentMethods] = useState([]);
   const [firstDate, setFirstDate] = useState(
     moment().startOf("day").format("yyyy-MM-DD")
   );
@@ -21,13 +22,23 @@ function UserSummary() {
     secondDate,
   });
   const [managers, setManagers] = useState([]);
-  const [manager, setManager] = useState(localStorage.getItem("id"));
+  const [pickup, setPickup] = useState(3);
+  const [manager, setManager] = useState(-2);
   const [managersLoading, setManagersLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const buttons = [];
   const buttons2 = [];
 
   useEffect(() => {
+    getOrgInfo({
+      setData: () => {},
+      setFetchLoading: () => {},
+      setValue: (key, v) => {
+        if (key === "paymentMethods") {
+          setFetchedPaymentMethods(v);
+        }
+      },
+    });
     getFinishedOrders({
       setFinishedOrdersLoading: setFetchLoading,
       setFinishedOrders: setOrders,
@@ -39,9 +50,73 @@ function UserSummary() {
     getManagers({ setManagers, setManagersLoading });
   }, []);
 
-  const filteredOrdersByManager = useMemo(() => {
+  const pickupOptions = useMemo(() => {
+    return [
+      { id: 3, name: "Все" },
+      { id: 1, name: "Доставка" },
+      { id: 2, name: "Самовывоз" },
+    ];
+  }, []);
+
+  const paymentMethods = useMemo(() => {
+    const temp = {};
+    for (let method of fetchedPaymentMethods) {
+      temp[method.code] = parseFloat(method.value);
+    }
+    return temp;
+  }, [fetchedPaymentMethods]);
+
+  const paymentMethodNames = useMemo(() => {
+    const temp = {};
+    for (let method of fetchedPaymentMethods) {
+      temp[method.code] = method.name;
+    }
+    return temp;
+  }, [fetchedPaymentMethods]);
+
+  const filteredOrdersByCountable = useMemo(() => {
     try {
       const temp = orders.filter((order) => {
+        return (
+          order.status !== "finished" ||
+          order.countable ||
+          Object.keys(order.kaspiinfo).length > 0
+        );
+      });
+      return temp;
+    } catch (e) {
+      console.log("Filter by Countable Error: ", e);
+      return [];
+    }
+  }, [orders]);
+
+  const filteredOrdersByPickup = useMemo(() => {
+    try {
+      if (pickup === 3) {
+        return filteredOrdersByCountable;
+      }
+      const temp = filteredOrdersByCountable.filter((order) => {
+        if (pickup === 1) {
+          return order.delivery !== 0;
+        }
+        if (pickup === 2) {
+          return order.delivery !== 1;
+        }
+        return true;
+      });
+      return temp;
+    } catch (e) {
+      console.log("Filter by Countable Error: ", e);
+      return [];
+    }
+  }, [filteredOrdersByCountable, pickup]);
+
+  const filteredOrdersByManager = useMemo(() => {
+    try {
+      if (manager === -2) {
+        return filteredOrdersByPickup;
+      }
+      const temp = filteredOrdersByPickup.filter((order) => {
         return order.authorId === manager;
       });
       return temp;
@@ -49,18 +124,24 @@ function UserSummary() {
       console.log("Filter by Managers Error: ", e);
       return [];
     }
-  }, [orders, manager]);
+  }, [filteredOrdersByPickup, manager]);
 
   const totals = useMemo(() => {
     const orders = filteredOrdersByManager;
     let totalSum = 0;
     let totalPurchaseSum = 0;
+    let paymentComission = 0;
     orders.forEach((order) => {
       let orderSum = 0;
       let purchaseSum = 0;
       let discountSum = 0;
       let orderDiscountSum = 0;
       let sum = 0;
+      let orderPaymentComission = 0;
+      order.payment.forEach((payment) => {
+        orderPaymentComission +=
+          (payment.sum * paymentMethods[payment.method]) / 100;
+      });
       order.goods.forEach((good) => {
         discountSum +=
           good.discount.type === "KZT"
@@ -70,6 +151,7 @@ function UserSummary() {
         orderSum += parseInt(good.price) * parseInt(good.quantity);
         purchaseSum += parseInt(good.purchase) * parseInt(good.quantity);
       });
+      paymentComission += orderPaymentComission;
       sum = orderSum - discountSum;
       orderDiscountSum =
         order.discount.type === "KZT"
@@ -79,11 +161,15 @@ function UserSummary() {
       totalPurchaseSum += purchaseSum;
     });
     return [
-      { text: "Реализовано:", sum: totalSum + "  ₸" },
-      { text: "Прибыль:", sum: totalSum - totalPurchaseSum + "  ₸" },
+      { text: "Реализовано:", sum: totalSum.toFixed(2) + "  ₸" },
+      {
+        text: "Прибыль:",
+        sum:
+          (totalSum - totalPurchaseSum - paymentComission).toFixed(2) + "  ₸",
+      },
       { text: "Всего продаж:", sum: orders.length + " шт." },
     ];
-  }, [filteredOrdersByManager]);
+  }, [filteredOrdersByManager, paymentMethods]);
 
   const totalsByDays = useMemo(() => {
     const dateDifference = moment(selectedDates.secondDate).diff(
@@ -110,12 +196,18 @@ function UserSummary() {
     temp.forEach((day) => {
       let totalSum = 0;
       let totalPurchaseSum = 0;
+      let paymentComission = 0;
       day.orders.forEach((order) => {
         let orderSum = 0;
         let purchaseSum = 0;
         let discountSum = 0;
         let orderDiscountSum = 0;
         let sum = 0;
+        let orderPaymentComission = 0;
+        order.payment.forEach((payment) => {
+          orderPaymentComission +=
+            (payment.sum * paymentMethods[payment.method]) / 100;
+        });
         order.goods.forEach((good) => {
           discountSum +=
             good.discount.type === "KZT"
@@ -132,12 +224,43 @@ function UserSummary() {
             : (sum * order.discount.amount) / 100;
         totalSum += sum - orderDiscountSum;
         totalPurchaseSum += purchaseSum;
+        paymentComission += orderPaymentComission;
       });
-      day.sum = totalSum;
-      day.profit = totalSum - totalPurchaseSum;
+      day.sum = totalSum.toFixed(2);
+      day.profit = (totalSum - totalPurchaseSum - paymentComission).toFixed(2);
     });
     return temp;
-  }, [selectedDates, filteredOrdersByManager]);
+  }, [selectedDates, filteredOrdersByManager, paymentMethods]);
+
+  const paymentTotals = useMemo(() => {
+    try {
+      const orders = filteredOrdersByManager;
+      const temp = {};
+      const final = [];
+      orders.forEach((order) => {
+        order.payment.forEach((payment) => {
+          if (!temp[payment.method]) {
+            temp[payment.method] = parseInt(payment.sum);
+          } else {
+            temp[payment.method] += parseInt(payment.sum);
+          }
+        });
+      });
+      Object.keys(temp).forEach((key, index) => {
+        const sum = temp[key].toFixed(2);
+        final.push({
+          id: index,
+          name: paymentMethodNames[key],
+          sum,
+          comission: ((sum * paymentMethods[key]) / 100).toFixed(2),
+        });
+      });
+      return final;
+    } catch (e) {
+      console.log("Payment Totals Error:", e);
+      return [];
+    }
+  }, [filteredOrdersByManager, paymentMethodNames, paymentMethods]);
 
   const handleUpdate = useCallback(() => {
     setSelectedDates({ firstDate, secondDate });
@@ -209,7 +332,15 @@ function UserSummary() {
             options={managers}
             loading={managersLoading}
             setValue={setManager}
-            type={"managers"}
+            type={"managers3"}
+            style={{ margin: "10px 0" }}
+          />
+          <p>Самовывоз/Доставка:</p>
+          <Select
+            value={pickup}
+            options={pickupOptions}
+            setValue={setPickup}
+            type={"pickup"}
             style={{ margin: "10px 0" }}
           />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -241,7 +372,15 @@ function UserSummary() {
               options={managers}
               loading={managersLoading}
               setValue={setManager}
-              type={"managers"}
+              type={"managers3"}
+              style={{ margin: "10px 0" }}
+            />
+            <p>Самовывоз/Доставка:</p>
+            <Select
+              value={pickup}
+              options={pickupOptions}
+              setValue={setPickup}
+              type={"pickup"}
               style={{ margin: "10px 0" }}
             />
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -296,7 +435,49 @@ function UserSummary() {
 
           <div
             className={cl.tableWrapper}
-            style={{ height: "inherit", marginTop: 30, marginBottom: 30 }}
+            style={{ height: "inherit", margin: "15px 0" }}
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Способ оплаты</th>
+                  <th>Сумма</th>
+                  <th>Комиссия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentTotals.map((total) => {
+                  return (
+                    <tr key={total.id}>
+                      <td>{total.name} </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        {total.sum} ₸
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        {total.comission} ₸
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div
+            className={cl.tableWrapper}
+            style={{
+              height: "inherit",
+              marginTop: 30,
+              marginBottom: 30,
+              maxHeight: 500,
+            }}
           >
             <table>
               <thead>

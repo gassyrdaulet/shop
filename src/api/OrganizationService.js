@@ -81,7 +81,11 @@ export const closeCashbox = async ({ setProcessLoading, cashboxId, next }) => {
     });
 };
 
-export const getOrgInfo = async ({ setData, setFetchLoading }) => {
+export const getOrgInfo = async ({
+  setData,
+  setFetchLoading,
+  setValue = () => {},
+}) => {
   setFetchLoading(true);
   const token = await cookies.get(TOKEN_NAME);
   axios
@@ -92,6 +96,10 @@ export const getOrgInfo = async ({ setData, setFetchLoading }) => {
     })
     .then(({ data }) => {
       setData(data);
+      const keys = Object.keys(data);
+      for (let key of keys) {
+        setValue(key, data[key]);
+      }
     })
     .catch((err) => {
       alert("Ошибка", errParser(err));

@@ -13,6 +13,7 @@ import {
   returnOrder,
   issuePickup,
   sendKaspiCode,
+  editOrderManager,
 } from "../api/OrderService";
 import Loading from "../components/Loading";
 import moment from "moment/moment";
@@ -21,10 +22,14 @@ import Modal from "../components/Modal";
 import LegendInput from "../components/LegendInput";
 import Button from "../components/Button";
 import Select from "../components/Select";
-import { getDelivers } from "../api/OrganizationService";
+import {
+  getDelivers,
+  getManagers,
+  getOrgInfo,
+} from "../api/OrganizationService";
 import NoPaymentRow from "../components/NoPaymentRow";
 import NoPaymentHeaders from "../components/NoPaymentHeaders";
-import { BiCheckCircle, BiPlusCircle } from "react-icons/bi";
+import { BiCheckCircle, BiPlusCircle, BiUserCircle } from "react-icons/bi";
 import SearchInput from "../components/SearchInput";
 
 function OrderDetails() {
@@ -43,8 +48,14 @@ function OrderDetails() {
   const [codeModal, setCodeModal] = useState(false);
   const [recreateModal, setRecreateModal] = useState(false);
   const [returnModal, setReturnModal] = useState(false);
+  const [editManagerModal, setEditManagerModal] = useState(false);
+  const [newManager, setNewManager] = useState(0);
+  const [managersLoading, setManagersLoading] = useState(true);
   const [deliver, setDeliver] = useState(-1);
   const [delivers, setDelivers] = useState([]);
+  const [fetchedPaymentMethods, setFetchedPaymentMethods] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState([]);
+  const [managers, setManagers] = useState([]);
   const [deliversLoading, setDeliversLoading] = useState(false);
   const [payment, setPayment] = useState([]);
 
@@ -73,6 +84,25 @@ function OrderDetails() {
       getDelivers({ setDelivers, setDeliversLoading });
     }
   }, [data]);
+
+  useEffect(() => {
+    getOrgInfo({
+      setData: () => {},
+      setFetchLoading: setPaymentsLoading,
+      setValue: (key, v) => {
+        if (key === "paymentMethods") {
+          setFetchedPaymentMethods(v);
+        }
+      },
+    });
+    getManagers({ setManagers, setManagersLoading });
+  }, []);
+
+  const managersWithStore = useMemo(() => {
+    const temp = [...managers];
+    temp.push({ id: -1, name: "Магазин" });
+    return temp;
+  }, [managers]);
 
   const orderStatuses = useMemo(() => {
     return {
@@ -110,14 +140,12 @@ function OrderDetails() {
   }, []);
 
   const paymentMethods = useMemo(() => {
-    return {
-      cash: "Наличка",
-      card: "Карта",
-      kaspigold: "Kaspi GOLD",
-      kaspired: "Kaspi RED",
-      kaspiqr: "Kaspi QR",
-    };
-  }, []);
+    const temp = {};
+    for (let method of fetchedPaymentMethods) {
+      temp[method.code] = method.name;
+    }
+    return temp;
+  }, [fetchedPaymentMethods]);
 
   const roles = useMemo(() => {
     return {
@@ -193,9 +221,9 @@ function OrderDetails() {
           (damount
             ? damount === 0
               ? ""
-              : ` (Скидка - ${damount}${
-                  dtype === "percent" ? "%" : dtype
-                } за шт.)`
+              : ` (${damount > 0 ? `Скидка` : `Наценка`} - ${Math.abs(
+                  damount
+                )}${dtype === "percent" ? "%" : dtype} за шт.)`
             : "")
         );
       });
@@ -311,7 +339,7 @@ function OrderDetails() {
   const isKaspi = useMemo(() => {
     try {
       if (data?.kaspiinfo) {
-        if (Object.keys(data.kaspiinfo) !== 0) {
+        if (Object.keys(data.kaspiinfo).length !== 0) {
           return true;
         }
       }
@@ -360,6 +388,15 @@ function OrderDetails() {
         navigate("/orders/edit/" + id);
       },
     },
+    {
+      show: true,
+      disabled: processLoading,
+      icon: <BiUserCircle />,
+      text: "Поменять продавца",
+      onClick: () => {
+        setEditManagerModal(true);
+      },
+    },
   ];
   const buttons3 = [
     {
@@ -381,7 +418,7 @@ function OrderDetails() {
   ];
   const buttons4 = [
     {
-      disabled: processLoading,
+      disabled: processLoading || paymentsLoading,
       icon: <BiPlusCircle />,
       text: "Добавить оплату",
       onClick: () => {
@@ -409,7 +446,7 @@ function OrderDetails() {
   ];
   const buttons9 = [
     {
-      disabled: processLoading,
+      disabled: processLoading || paymentsLoading,
       icon: <BiPlusCircle />,
       text: "Добавить оплату",
       onClick: () => {
@@ -1051,6 +1088,7 @@ function OrderDetails() {
                 {payment.map((item, index) => {
                   return (
                     <NoPaymentRow
+                      paymentMethods={fetchedPaymentMethods}
                       key={item.id}
                       setPayment={setPayment}
                       payment={payment}
@@ -1124,6 +1162,7 @@ function OrderDetails() {
                 {payment.map((item, index) => {
                   return (
                     <NoPaymentRow
+                      paymentMethods={fetchedPaymentMethods}
                       key={item.id}
                       setPayment={setPayment}
                       payment={payment}
@@ -1173,12 +1212,64 @@ function OrderDetails() {
           disabled={processLoading}
           inputMode="numeric"
         />
-        <Button
-          disabled={processLoading}
-          text="Подтвердить"
-          icon={<BiCheckCircle />}
-          onClick={() => {}}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+            marginTop: 10,
+          }}
+        >
+          <Button
+            disabled={processLoading}
+            text="Подтвердить"
+            icon={<BiCheckCircle />}
+            onClick={() => {}}
+          />
+        </div>
+      </Modal>
+      <Modal
+        noEscape={processLoading}
+        modalVisible={editManagerModal}
+        setModalVisible={setEditManagerModal}
+      >
+        <p>Выберите курьера</p>
+        <Select
+          value={newManager}
+          options={managersWithStore}
+          loading={managersLoading || processLoading}
+          setValue={setNewManager}
+          type={"managerswithstore"}
+          style={{ margin: "10px 0" }}
         />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+            marginTop: 10,
+          }}
+        >
+          <Button
+            disabled={processLoading}
+            text="Подтвердить"
+            icon={<BiCheckCircle />}
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Вы уверены что хотите поменять продавца этой продажи?"
+                )
+              ) {
+                editOrderManager({
+                  newManager,
+                  setProcessLoading,
+                  orderId: id,
+                  next: () => navigate(0),
+                });
+              }
+            }}
+          />
+        </div>
       </Modal>
     </div>
   );

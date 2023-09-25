@@ -16,7 +16,7 @@ import NoPaymentHeaders from "../components/NoPaymentHeaders";
 import NoPaymentRow from "../components/NoPaymentRow";
 import useAuth from "../hooks/useAuth";
 import CheckBox from "../components/CheckBox";
-import { getManagers } from "../api/OrganizationService";
+import { getManagers, getOrgInfo } from "../api/OrganizationService";
 import { editOrder, getOrderDetails } from "../api/OrderService";
 
 function EditOrder() {
@@ -34,6 +34,8 @@ function EditOrder() {
   const [fetchedGroups, setFetchedGroups] = useState([]);
   const [goodsVisible, setGoodsVisible] = useState(false);
   const [goods, setGoods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [payment, setPayment] = useState([]);
   const [data, setData] = useState({});
   const [fetchOrderInfoLoading, setFetchOrderInfoLoading] = useState(false);
@@ -133,7 +135,11 @@ function EditOrder() {
         };
       })
     );
-    setPayment(data.payment);
+    setPayment(
+      data.payment.map((item, id) => {
+        return { ...item, id };
+      })
+    );
     setDiscount(data.discount);
     setDate(moment(data.creationdate).format("yyyy-MM-DD"));
   }, [data]);
@@ -188,7 +194,7 @@ function EditOrder() {
   ];
   const buttons4 = [
     {
-      disabled: editLoading || fetchOrderInfoLoading,
+      disabled: editLoading || fetchOrderInfoLoading || paymentsLoading,
       icon: <BsPlusCircle />,
       text: "Добавить оплату",
       onClick: () => {
@@ -427,6 +433,15 @@ function EditOrder() {
   };
 
   useEffect(() => {
+    getOrgInfo({
+      setData: () => {},
+      setFetchLoading: setPaymentsLoading,
+      setValue: (key, v) => {
+        if (key === "paymentMethods") {
+          setPaymentMethods(v);
+        }
+      },
+    });
     getManagers({ setManagers, setManagersLoading });
     getGoodsAndGroups({
       setFetchLoading,
@@ -727,6 +742,7 @@ function EditOrder() {
                         return (
                           <NoPaymentRow
                             key={item.id}
+                            paymentMethods={paymentMethods}
                             setPayment={setPayment}
                             payment={payment}
                             editable={!fetchOrderInfoLoading}
@@ -981,7 +997,7 @@ function EditOrder() {
                           name: good.name,
                           price: good.price,
                           purchase: good.purchase,
-                          quantity: 0,
+                          quantity: 1,
                           discount: { amount: 0, type: "KZT" },
                           remainder: good.remainder,
                         });

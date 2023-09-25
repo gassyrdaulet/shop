@@ -47,6 +47,20 @@ function Select({
       ) : (
         ""
       )}
+      {type === "managers3" ? (
+        <option key={-2} value={-2}>
+          Все
+        </option>
+      ) : (
+        ""
+      )}
+      {type === "managers3" ? (
+        <option key={-1} value={-1}>
+          Магазин
+        </option>
+      ) : (
+        ""
+      )}
       {options.map((option) => {
         return (
           <option key={option.id} value={option.id}>

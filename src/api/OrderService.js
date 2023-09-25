@@ -235,6 +235,36 @@ export const editOrder = async ({ order, setEditLoading, id, next }) => {
     });
 };
 
+export const editOrderManager = async ({
+  newManager,
+  setProcessLoading,
+  orderId,
+  next,
+}) => {
+  setProcessLoading(true);
+  const token = await cookies.get(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/orders/editmanager`,
+      { managerId: newManager, orderId },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(() => {
+      alert("Успешно", `Вы успешно отредактировали заказ.`);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
 export const sendDeliver = async ({
   deliver,
   setProcessLoading,

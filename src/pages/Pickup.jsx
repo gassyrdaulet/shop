@@ -485,7 +485,7 @@ function Pickup() {
           </div>
           <div
             className={cl.tableWrapper}
-            style={{ height: "inherit", marginBottom: 50 }}
+            style={{ height: "inherit", marginBottom: 50, maxHeight: 600 }}
           >
             {ordersLoading || finishedOrdersLoading ? (
               <div

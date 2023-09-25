@@ -6,6 +6,7 @@ import { getGoodsAndGroups } from "../api/GoodService.js";
 import SearchInput from "../components/SearchInput";
 import Loading from "../components/Loading";
 import useAuth from "../hooks/useAuth";
+import ScreenFixer from "../components/ScreenFixer";
 import NoGoodHeaders from "../components/NoGoodHeaders";
 import NoGoodRow from "../components/NoGoodRow";
 import NoPaymentHeaders from "../components/NoPaymentHeaders";
@@ -44,6 +45,7 @@ import {
   getCashbox,
   openCashbox,
   closeCashbox,
+  getOrgInfo,
 } from "../api/OrganizationService";
 import { AiFillCloseCircle } from "react-icons/ai";
 
@@ -52,6 +54,8 @@ function Cash() {
   const [cashbox, setCashbox] = useState({});
   const [orderDataLoading, setOrderDataLoading] = useState(false);
   const [goods, setGoods] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [groups, setGroups] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -161,10 +165,15 @@ function Cash() {
   }, [filteredOrders]);
 
   useEffect(() => {
-    setCashBoxModal(true);
-    setTimeout(() => {
-      setCashBoxModal(false);
-    }, 1500);
+    getOrgInfo({
+      setData: () => {},
+      setFetchLoading: setPaymentsLoading,
+      setValue: (key, value) => {
+        if (key === "paymentMethods") {
+          setPaymentMethods(value);
+        }
+      },
+    });
     getCashbox({ setCashboxLoading, setCashbox });
     getManagers({ setManagers, setManagersLoading });
     getOrders({ setOrdersLoading, setOrders, status: "pickup" });
@@ -182,8 +191,7 @@ function Cash() {
 
   useEffect(() => {
     setFixed(true);
-    return () => setFixed(false);
-  }, [setFixed, returnModal, paymentModal, setAsideModal, cashBoxModal]);
+  }, [setFixed]);
 
   useEffect(() => {
     if (!orderData) {
@@ -460,7 +468,7 @@ function Cash() {
       onClick: () => setSetAsideModal(true),
     },
     {
-      disabled: processLoading,
+      disabled: processLoading || paymentsLoading,
       icon: <BiMoney />,
       color: "#4671D5",
       text: "Принять оплату",
@@ -667,6 +675,7 @@ function Cash() {
 
   return (
     <div className="pageWrapper">
+      <ScreenFixer />
       <div className={cl.Options}>
         <div className={cl.OptionsButtons}>
           {buttons.map((button) => {
@@ -833,7 +842,7 @@ function Cash() {
                             name: good.name,
                             price: good.price,
                             purchase: good.purchase,
-                            quantity: 0,
+                            quantity: 1,
                             discount: { amount: 0, type: "KZT" },
                             remainder: good.remainder,
                           });
@@ -1082,10 +1091,11 @@ function Cash() {
                           key={item.id}
                           setPayment={setPayment}
                           payment={payment}
-                          editable={!processLoading || item.editable}
+                          editable={true || !processLoading || item.editable}
                           index={index + 1}
                           paymentItem={item}
                           setFocusedInput={setFocusedInput}
+                          paymentMethods={paymentMethods}
                         />
                       );
                     })}
