@@ -6,6 +6,9 @@ function ScreenFixer() {
 
   useEffect(() => {
     setFixed(true);
+    return () => {
+      setFixed(false);
+    };
   }, [setFixed, fixed]);
 
   return;
