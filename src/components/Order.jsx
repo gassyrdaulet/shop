@@ -96,7 +96,7 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
           : moment(order.creationdate).format("DD.MM.yyyy HH:mm")}
       </td>
       <td style={{ textAlign: "center" }}>
-        {orderStatus ? `${orderStatus}` : ""}
+        {orderStatus ? `${orderStatus}` : ""} (ID: {order.id})
       </td>
     </tr>
   );

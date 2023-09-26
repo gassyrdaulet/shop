@@ -468,7 +468,7 @@ function Delivery() {
             id,
             address: order.deliveryinfo.address,
             deliveryPay: order.deliveryinfo.deliveryPriceForDeliver,
-            sum: sumWithDiscount,
+            sum: order.iskaspi === 1 ? 0 : sumWithDiscount,
             status: order.status,
           });
         }

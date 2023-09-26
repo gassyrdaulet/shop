@@ -64,14 +64,14 @@ function NewOrder() {
       title: "Стоимость доставки для клиента",
       type: "text",
       inputMode: "numeric",
-      value: "",
+      value: "0",
       name: "deliveryPriceForCustomer",
     },
     {
       title: "Зарплата курьера",
       type: "text",
       inputMode: "numeric",
-      value: "",
+      value: "0",
       name: "deliveryPriceForDeliver",
     },
     {
@@ -355,11 +355,21 @@ function NewOrder() {
     for (let item of temp) {
       if (item.name === name) {
         if (name.startsWith("deliveryPrice")) {
+          const value2 = (value + "").startsWith("0")
+            ? (value + "").replace("0", "") === ""
+              ? 0
+              : (value + "").replace("0", "")
+            : value + "";
           const result = parseInt(
-            (value + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
+            (value2 + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
           );
           const result2 = isNaN(result) ? 0 : result;
           item.value = result2;
+          break;
+        }
+        if (item.name === "cellphone") {
+          const finalValue = value.replaceAll(" ", "");
+          item.value = finalValue;
           break;
         }
         item.value = value;
