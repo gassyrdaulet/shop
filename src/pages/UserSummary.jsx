@@ -77,6 +77,7 @@ function UserSummary() {
   const filteredOrdersByCountable = useMemo(() => {
     try {
       const temp = orders.filter((order) => {
+        const wasReturned = order.wasReturned ? order.wasReturned : false;
         const kaspiInfo = order?.kaspiinfo;
         const kaspiInfoObject = kaspiInfo ? Object.keys(kaspiInfo) : [];
         const isKaspi = kaspiInfoObject ? kaspiInfoObject.length > 0 : false;
@@ -84,7 +85,7 @@ function UserSummary() {
           order.status === "finished" &&
           order.countable === 1 &&
           !isKaspi &&
-          order.wasReturned === 0
+          !wasReturned
         );
       });
       return temp;
