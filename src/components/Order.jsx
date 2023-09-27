@@ -52,14 +52,23 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
     return parsedString;
   }, [order]);
 
+  const backgroundColor = useMemo(() => {
+    if (checked) {
+      return "#58cf99";
+    }
+    if (order.status === "cancelled" || order.status === "returned") {
+      return "#cd8faa";
+    } else if (order.status === "finished" && order.wasReturned === 1) {
+      return "#cdcdaa";
+    } else {
+      return "";
+    }
+  }, [order, checked]);
+
   return (
     <tr
       style={{
-        backgroundColor: checked
-          ? "#58cf99"
-          : order.status === "cancelled"
-          ? "#cd8faa"
-          : "",
+        backgroundColor,
       }}
       onClick={() => handleMark(order.id)}
     >

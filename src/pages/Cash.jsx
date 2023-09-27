@@ -77,6 +77,7 @@ function Cash() {
   const [returnModal, setReturnModal] = useState(false);
   const [cashBoxModal, setCashBoxModal] = useState(false);
   const [printCheck, setPrintCheck] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState();
   const [nowEditing, setNowEditing] = useState(null);
   const navigate = useNavigate();
@@ -475,7 +476,11 @@ function Cash() {
       onClick: () => setPaymentModal(true),
     },
     {
-      // disabled: goodsForSell.length === 0 || difference !== 0 || processLoading,
+      disabled:
+        goodsForSell.length === 0 ||
+        difference !== 0 ||
+        processLoading ||
+        updateLoading,
       icon: <BiCheckCircle />,
       text: "Продать",
       color: "#39E639",
@@ -494,7 +499,11 @@ function Cash() {
             setProcessLoading,
             payment: [],
             id: nowEditing,
-            next: () => navigate(0),
+            next: () => {
+              setGoodsForSell([]);
+              setUpdateLoading(true);
+              navigate(0);
+            },
           });
         } else {
           cashOrder({
@@ -511,6 +520,8 @@ function Cash() {
               cashier: localStorage.getItem("id"),
             },
             next: () => {
+              setGoodsForSell([]);
+              setUpdateLoading(true);
               navigate(0);
             },
           });
