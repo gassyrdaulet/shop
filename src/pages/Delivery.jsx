@@ -500,8 +500,10 @@ function Delivery() {
     let orderSums = 0;
     let deliveryCosts = 0;
     let countableSum = 0;
+    let cancelledSum = 0;
     payoffDeliveriesList.forEach((item) => {
       if (item.status === "cancelled") {
+        cancelledSum++;
         return;
       }
       paymentSums += item.paymentSum;
@@ -509,7 +511,13 @@ function Delivery() {
       orderSums += item.sum;
       deliveryCosts += item.deliveryPay;
     });
-    return { orderSums, deliveryCosts, countableSum, paymentSums };
+    return {
+      orderSums,
+      deliveryCosts,
+      countableSum,
+      paymentSums,
+      cancelledSum,
+    };
   }, [payoffDeliveriesList]);
 
   const onChangeDeliveryPay = useCallback((id, value) => {
@@ -880,6 +888,8 @@ function Delivery() {
                   );
                 })
               )}
+            </tbody>
+            <tfoot>
               <tr>
                 <td
                   style={{
@@ -889,7 +899,11 @@ function Delivery() {
                     minWidth: "50px",
                   }}
                 >
-                  {payoffDeliveriesList.length} шт.
+                  {payoffDeliveriesList.length -
+                    (payoffDeliveriesSum?.cancelledSum
+                      ? payoffDeliveriesSum.cancelledSum
+                      : 0)}{" "}
+                  шт.
                 </td>
                 <td
                   style={{
@@ -934,7 +948,7 @@ function Delivery() {
                   тг
                 </td>
               </tr>
-            </tbody>
+            </tfoot>
           </table>
         </div>
         <div

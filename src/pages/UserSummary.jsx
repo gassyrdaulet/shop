@@ -226,7 +226,9 @@ function UserSummary() {
     }
     filteredOrdersByManager.forEach((order) => {
       for (let item of temp) {
-        if (moment(order.finisheddate).isSame(moment(item.date), "day")) {
+        if (
+          moment(order[dateTypes[dateType]]).isSame(moment(item.date), "day")
+        ) {
           item.orders.push(order);
           break;
         }
@@ -269,7 +271,13 @@ function UserSummary() {
       day.profit = (totalSum - totalPurchaseSum - paymentComission).toFixed(2);
     });
     return temp;
-  }, [selectedDates, filteredOrdersByManager, paymentMethods]);
+  }, [
+    selectedDates,
+    filteredOrdersByManager,
+    paymentMethods,
+    dateTypes,
+    dateType,
+  ]);
 
   const paymentTotals = useMemo(() => {
     try {
