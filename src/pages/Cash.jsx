@@ -178,7 +178,19 @@ function Cash() {
     getCashbox({ setCashboxLoading, setCashbox });
     getManagers({ setManagers, setManagersLoading });
     getOrders({ setOrdersLoading, setOrders, status: "pickup" });
+  }, []);
+
+  useEffect(() => {
     getGoodsAndGroups({ setFetchLoading, setGoods, setGroups, next: () => {} });
+    const interval = setInterval(() => {
+      getGoodsAndGroups({
+        setFetchLoading,
+        setGoods,
+        setGroups,
+        next: () => {},
+      });
+    }, 300000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

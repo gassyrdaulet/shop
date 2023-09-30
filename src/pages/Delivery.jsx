@@ -7,6 +7,7 @@ import {
   BsQuestionCircleFill,
   BsHourglassSplit,
   BsSend,
+  BsEyeSlashFill,
 } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMemo, useEffect, useState, useCallback } from "react";
@@ -19,7 +20,12 @@ import SearchInput from "../components/SearchInput";
 import LegendInput from "../components/LegendInput";
 import Select from "../components/Select";
 import moment from "moment";
-import { BiSync, BiCheck, BiChevronLeftCircle } from "react-icons/bi";
+import {
+  BiSync,
+  BiCheck,
+  BiChevronLeftCircle,
+  BiCheckCircle,
+} from "react-icons/bi";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import { getDelivers, getManagers } from "../api/OrganizationService";
 import { sendDeliver, finishOrder } from "../api/OrderService";
@@ -52,6 +58,7 @@ function Delivery() {
   );
   const [dateType, setDateType] = useState(1);
   const [markedIds, setMarkedIds] = useState({});
+  const [payoffDeliveriesList, setPayOffDeliveriesList] = useState([]);
 
   useEffect(() => {
     const types = ["new", "processing", "delivering", "archive"];
@@ -437,15 +444,21 @@ function Delivery() {
     }
   }, [markedIds, filteredOrdersBySearch]);
 
-  const payoffDeliveriesList = useMemo(() => {
+  useEffect(() => {
     if (deliveryStatus !== "processing") {
-      return [];
+      setPayOffDeliveriesList([]);
     }
     const result = [];
     Object.keys(markedIds).forEach((id) => {
       for (let order of orders) {
         if (order.id === parseInt(id)) {
-          const { goods, deliveryinfo, discount } = order;
+          const { goods, deliveryinfo, discount, payment } = order;
+          let paymentSum = 0;
+          payment.forEach((item) => {
+            if (item?.user === "deliver") {
+              paymentSum += item.sum;
+            }
+          });
           let sum = 0;
           goods.forEach(
             (good) =>
@@ -468,30 +481,48 @@ function Delivery() {
             id,
             address: order.deliveryinfo.address,
             deliveryPay: order.deliveryinfo.deliveryPriceForDeliver,
-            sum: order.iskaspi === 1 ? 0 : sumWithDiscount,
+            sum: sumWithDiscount,
+            paymentSum: paymentSum,
             status: order.status,
+            countable: order.countable === 1,
           });
         }
       }
     });
-    return result;
+    setPayOffDeliveriesList(result);
   }, [markedIds, orders, deliveryStatus]);
 
   const payoffDeliveriesSum = useMemo(() => {
     if (payoffDeliveriesList.length === 0) {
       return undefined;
     }
+    let paymentSums = 0;
     let orderSums = 0;
     let deliveryCosts = 0;
+    let countableSum = 0;
     payoffDeliveriesList.forEach((item) => {
       if (item.status === "cancelled") {
         return;
       }
+      paymentSums += item.paymentSum;
+      countableSum += item.countable ? 1 : 0;
       orderSums += item.sum;
       deliveryCosts += item.deliveryPay;
     });
-    return { orderSums, deliveryCosts };
+    return { orderSums, deliveryCosts, countableSum, paymentSums };
   }, [payoffDeliveriesList]);
+
+  const onChangeDeliveryPay = useCallback((id, value) => {
+    setPayOffDeliveriesList((prev) => {
+      const temp = [...prev];
+      for (let item of temp) {
+        if (item.id === id) {
+          item.deliveryPay = isNaN(parseInt(value)) ? 0 : parseInt(value);
+        }
+      }
+      return temp;
+    });
+  }, []);
 
   return (
     <div className="pageWrapper">
@@ -777,10 +808,12 @@ function Delivery() {
             <thead>
               <tr>
                 <th>№</th>
+                <th>Входит в отчет</th>
                 <th>Адрес</th>
                 <th>Статус</th>
                 <th>Стоимость доставки</th>
-                <th>Сумма</th>
+                <th>Сумма заказа</th>
+                <th>Курьер принял</th>
               </tr>
             </thead>
             <tbody>
@@ -803,6 +836,20 @@ function Delivery() {
                       <td style={{ textAlign: "center" }}>{index + 1}</td>
                       <td
                         style={{
+                          textAlign: "center",
+                          width: "inherit",
+                          maxWidth: "inherit",
+                          minWidth: "50px",
+                        }}
+                      >
+                        {item.countable ? (
+                          <BiCheckCircle color="#47cc47" />
+                        ) : (
+                          <BsEyeSlashFill color="#cc4747" />
+                        )}
+                      </td>
+                      <td
+                        style={{
                           width: "inherit",
                           maxWidth: "inherit",
                           minWidth: "100px",
@@ -814,22 +861,57 @@ function Delivery() {
                         {statusesRussian[item.status]}
                       </td>
                       <td style={{ textAlign: "center" }}>
-                        {item.deliveryPay} тг
+                        <input
+                          style={{ maxWidth: 150, width: 100, minWidth: 50 }}
+                          type="text"
+                          inputMode="text"
+                          value={item.deliveryPay}
+                          onChange={(e) => {
+                            onChangeDeliveryPay(item.id, e.target.value);
+                          }}
+                        />
+                        тг
                       </td>
                       <td style={{ textAlign: "center" }}>{item.sum} тг</td>
+                      <td style={{ textAlign: "center" }}>
+                        {item.paymentSum} тг
+                      </td>
                     </tr>
                   );
                 })
               )}
               <tr>
-                <td colSpan={3}>
+                <td
+                  style={{
+                    textAlign: "center",
+                    width: "inherit",
+                    maxWidth: "inherit",
+                    minWidth: "50px",
+                  }}
+                >
+                  {payoffDeliveriesList.length} шт.
+                </td>
+                <td
+                  style={{
+                    textAlign: "center",
+                    width: "inherit",
+                    maxWidth: "inherit",
+                    minWidth: "50px",
+                  }}
+                >
+                  {payoffDeliveriesSum?.countableSum
+                    ? payoffDeliveriesSum.countableSum
+                    : 0}{" "}
+                  шт.
+                </td>
+                <td style={{ fontWeight: "bold" }} colSpan={2}>
                   Всего:{" "}
                   {isNaN(
-                    payoffDeliveriesSum?.orderSums -
+                    payoffDeliveriesSum?.paymentSums -
                       payoffDeliveriesSum?.deliveryCosts
                   )
                     ? 0
-                    : payoffDeliveriesSum?.orderSums -
+                    : payoffDeliveriesSum?.paymentSums -
                       payoffDeliveriesSum?.deliveryCosts}{" "}
                   тг
                 </td>
@@ -842,6 +924,12 @@ function Delivery() {
                 <td style={{ textAlign: "center" }}>
                   {payoffDeliveriesSum?.orderSums
                     ? payoffDeliveriesSum.orderSums
+                    : 0}{" "}
+                  тг
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  {payoffDeliveriesSum?.paymentSums
+                    ? payoffDeliveriesSum.paymentSums
                     : 0}{" "}
                   тг
                 </td>

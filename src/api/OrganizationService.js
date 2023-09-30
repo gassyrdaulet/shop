@@ -164,6 +164,56 @@ export const getManagers = async ({ setManagers, setManagersLoading }) => {
     });
 };
 
+export const getManagersForSummary = async ({
+  setManagers,
+  setManagersLoading,
+}) => {
+  setManagersLoading(true);
+  const token = await cookies.get(TOKEN_NAME);
+  axios
+    .get(`${SERVER_URL}/api/organization/getusers`, {
+      headers: {
+        [TOKEN_NAME]: token,
+      },
+    })
+    .then(({ data }) => {
+      const requesterId = parseInt(localStorage.getItem("id"));
+      let requesterRoles = {};
+      const managers = [];
+      for (let user of data) {
+        if (user.id === requesterId) {
+          requesterRoles = user;
+        }
+        if (user.manager) {
+          managers.push({
+            value: user.id,
+            name: user.name,
+            id: user.id,
+          });
+        }
+      }
+      if (requesterRoles.admin) {
+        setManagers([
+          { value: -2, name: "Все", id: -2 },
+          { value: -1, name: "Магазин", id: -1 },
+          ...managers,
+        ]);
+      } else {
+        setManagers(
+          [requesterRoles].map((item) => {
+            return { value: item.id, name: item.name, id: item.id };
+          })
+        );
+      }
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setManagersLoading(false);
+    });
+};
+
 export const getUsers = async ({ setUsers, setFetchLoading }) => {
   setFetchLoading(true);
   const token = await cookies.get(TOKEN_NAME);

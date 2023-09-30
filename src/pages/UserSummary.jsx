@@ -4,7 +4,10 @@ import cl from "../styles/Goods.module.css";
 import SearchInput from "../components/SearchInput";
 import Select from "../components/Select";
 import Button from "../components/Button";
-import { getManagers, getOrgInfo } from "../api/OrganizationService";
+import {
+  getManagersForSummary as getManagers,
+  getOrgInfo,
+} from "../api/OrganizationService";
 import { getFinishedOrders } from "../api/OrderService";
 import Loading from "../components/Loading";
 
@@ -26,6 +29,7 @@ function UserSummary() {
   const [manager, setManager] = useState(-2);
   const [managersLoading, setManagersLoading] = useState(true);
   const [orders, setOrders] = useState([]);
+  const [dateType, setDateType] = useState(1);
   const buttons = [];
   const buttons2 = [];
 
@@ -56,6 +60,36 @@ function UserSummary() {
       { id: 1, name: "Доставка" },
       { id: 2, name: "Самовывоз" },
     ];
+  }, []);
+
+  const dateTypesOptions = useMemo(() => {
+    return [
+      {
+        name: "По завершенной дате",
+        id: 1,
+      },
+      {
+        name: "По дате выдачи",
+        id: 2,
+      },
+      {
+        name: "По дате отправления",
+        id: 3,
+      },
+      {
+        name: "По дате создания",
+        id: 4,
+      },
+    ];
+  }, []);
+
+  const dateTypes = useMemo(() => {
+    return {
+      1: "finisheddate",
+      2: "delivereddate",
+      3: "wentdate",
+      4: "creationdate",
+    };
   }, []);
 
   const paymentMethods = useMemo(() => {
@@ -274,10 +308,10 @@ function UserSummary() {
       setFinishedOrders: setOrders,
       firstDate,
       secondDate,
-      dateType: "finisheddate",
+      dateType: dateTypes[dateType],
       delivery: null,
     });
-  }, [firstDate, secondDate]);
+  }, [firstDate, secondDate, dateTypes, dateType]);
 
   return (
     <div className="pageWrapper">
@@ -331,13 +365,22 @@ function UserSummary() {
             className={cl.SearchInput}
             type="date"
           />
+          <p>По дате:</p>
+          <Select
+            type="dateType"
+            options={dateTypesOptions}
+            setValue={setDateType}
+            value={dateType}
+            loading={fecthLoading}
+            style={{ margin: "10px 0" }}
+          />
           <p>Продавец:</p>
           <Select
             value={manager}
             options={managers}
             loading={managersLoading}
             setValue={setManager}
-            type={"managers3"}
+            type={""}
             style={{ margin: "10px 0" }}
           />
           <p>Самовывоз/Доставка:</p>
@@ -371,13 +414,22 @@ function UserSummary() {
               className={cl.SearchInput}
               type="date"
             />
+            <p>По дате:</p>
+            <Select
+              type="dateType"
+              options={dateTypesOptions}
+              setValue={setDateType}
+              value={dateType}
+              loading={fecthLoading}
+              style={{ margin: "10px 0" }}
+            />
             <p>Продавец:</p>
             <Select
               value={manager}
               options={managers}
               loading={managersLoading}
               setValue={setManager}
-              type={"managers3"}
+              type={""}
               style={{ margin: "10px 0" }}
             />
             <p>Самовывоз/Доставка:</p>
