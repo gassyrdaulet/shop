@@ -172,7 +172,7 @@ function Delivery() {
     {
       show: someoneIsMarked && deliveryStatus === "new",
       icon: <BsSend />,
-      text: "Отправить",
+      text: `Отправить (${Object.keys(markedIds).length})`,
       onClick: () => setPickDeliverModal(true),
     },
     {

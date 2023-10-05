@@ -97,15 +97,17 @@
   flex-direction: row;
   align-items: center;
   padding: 0 10px;
+  overflow: auto;
 }
 .OptionsButton {
+  white-space: nowrap;
   user-select: none;
   font-size: 14px;
   display: flex;
+  max-height: 30px;
   flex-direction: row;
-  align-items: center;
-  cursor: pointer;
   justify-content: center;
+  cursor: pointer;
   margin: 0 5px;
   color: rgb(41, 116, 208);
   background-color: #f8f8f8;
@@ -147,8 +149,8 @@
   background-color: rgb(217, 217, 217);
 }
 .OptionsButton svg {
-  width: 12px;
-  height: 12px;
+  min-width: 15px;
+  min-height: 15px;
   margin-right: 5px;
 }
 .SearchInput {

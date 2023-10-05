@@ -76,7 +76,7 @@ function Acceptance() {
   const buttons = [
     {
       icon: <BsPlusCircle />,
-      text: type === "acceptance" ? "Создать приемку" : "Создать списание",
+      text: type === "acceptance" ? "Приемка" : "Списание",
       onClick: () => {
         if (type === "acceptance") {
           navigate("/warehouse/new/ac");

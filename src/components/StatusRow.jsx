@@ -19,7 +19,8 @@ function StatusRow({
           : "rgb(41, 116, 208)",
         display: "flex",
         alignItems: "center",
-        flexDirection: "row",
+        justifyContent: "center",
+        flexDirection: mobile ? "column" : "row",
         padding: 10,
         textAlign: "start",
         backgroundColor:
@@ -40,10 +41,22 @@ function StatusRow({
       key={item.text}
     >
       <span style={{ marginRight: 5 }}>{icons[item.name]}</span>
-      <p style={{ fontSize: 12 }}>
-        {item.text}
-        {total ? ` (${total})` : ""}
-      </p>
+      <span
+        style={{
+          display: "block",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        <p
+          style={{
+            fontSize: 12,
+          }}
+        >
+          {item.text}
+          {total ? ` (${total})` : ""}
+        </p>
+      </span>
     </div>
   );
 }

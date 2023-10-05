@@ -94,7 +94,7 @@ function Cash() {
     {
       disabled: processLoading,
       icon: <BiSad />,
-      text: "Оформить возврат по чеку",
+      text: "Возврат по чеку",
       onClick: () => setReturnModal(true),
     },
   ];
