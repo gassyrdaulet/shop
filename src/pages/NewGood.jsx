@@ -21,6 +21,11 @@ function NewGood() {
     setInputs((temp) => {
       for (let input of temp) {
         if (input.id === id) {
+          if (id === 3) {
+            const parsedValue = parseInt(value);
+            input.value = isNaN(parsedValue) ? 0 : parsedValue;
+            break;
+          }
           input.value = value;
           break;
         }
@@ -93,7 +98,7 @@ function NewGood() {
       type: "input",
       inputType: "text",
       inputMode: "numeric",
-      value: "",
+      value: "0",
       id: 3,
       placeholder: "0",
       name: "price",

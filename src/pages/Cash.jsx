@@ -203,8 +203,12 @@ function Cash() {
   }, [search]);
 
   useEffect(() => {
+    if (window.innerHeight < 300 || window.innerWidth < 900) {
+      setFixed(false);
+      return;
+    }
     setFixed(true);
-  }, [setFixed]);
+  }, [setFixed, window.innerHeight, window.innerWidth]);
 
   useEffect(() => {
     if (!orderData) {
@@ -247,11 +251,9 @@ function Cash() {
 
   const handleDiscountChange = (value) => {
     const temp = { ...discount };
-    const result = parseInt(
-      (value + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
-    );
-    const result2 = isNaN(result) ? 0 : result;
-    temp.amount = result2;
+    const parsedValue = parseInt(value);
+    const result = isNaN(parsedValue) ? 0 : parsedValue;
+    temp.amount = result;
     setDiscount(temp);
   };
 
@@ -1313,6 +1315,7 @@ function Cash() {
           Дата открытия:{" "}
           {moment(cashbox?.openeddate).format("HH:mm DD.MM.yyyy")}
         </p>
+        <p>Наличка: {cashbox?.cash ? cashbox.cash : 0} тг</p>
         <div
           style={{
             display: "flex",

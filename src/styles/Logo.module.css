@@ -14,6 +14,7 @@
   min-width: 47px;
   min-height: 47px;
   background-color: white;
+  overflow: hidden;
 }
 .Word {
   color: red;
@@ -21,4 +22,8 @@
   font-size: 13px;
   font-weight: bold;
   font-style: italic;
+}
+.logoImage {
+  width: 50px;
+  height: 50px;
 }

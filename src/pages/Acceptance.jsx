@@ -15,7 +15,7 @@ function Acceptance() {
   const [isInvLoading, setIsInvLoading] = useState(false);
   const [searchId, setSearchId] = useState("");
   const [firstDate, setFirstDate] = useState(
-    moment().subtract(6, "months").format("yyyy-MM-DD")
+    moment().subtract(1, "months").format("yyyy-MM-DD")
   );
   const [secondDate, setSecondDate] = useState(moment().format("yyyy-MM-DD"));
 
@@ -117,6 +117,7 @@ function Acceptance() {
             />
             <p>С:</p>
             <SearchInput
+              isDate={true}
               placeholder="с"
               value={firstDate}
               setValue={setFirstDate}
@@ -125,6 +126,7 @@ function Acceptance() {
             />
             <p>До:</p>
             <SearchInput
+              isDate={true}
               placeholder="до"
               value={secondDate}
               setValue={setSecondDate}
@@ -158,6 +160,7 @@ function Acceptance() {
             />
             <p>С:</p>
             <SearchInput
+              isDate={true}
               placeholder="с"
               value={firstDate}
               setValue={setFirstDate}
@@ -167,6 +170,7 @@ function Acceptance() {
             <p>До:</p>
             <SearchInput
               placeholder="до"
+              isDate={true}
               value={secondDate}
               setValue={setSecondDate}
               className={cl.SearchInput}

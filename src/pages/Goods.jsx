@@ -118,6 +118,21 @@ function Goods() {
     }
   }, [sortFilteredGoods, searchInput]);
 
+  const totalInfo = useMemo(() => {
+    let purchaseSum = 0;
+    let totalSum = 0;
+    let remainderSum = 0;
+    filteredGoods.forEach((good) => {
+      purchaseSum += good.purchase * good.remainder;
+      totalSum += good.price * good.remainder;
+      remainderSum += good.remainder;
+    });
+    const purchaseSumParsed = new Intl.NumberFormat("ru").format(purchaseSum);
+    const totalSumParsed = new Intl.NumberFormat("ru").format(totalSum);
+    const remainderSumParsed = new Intl.NumberFormat("ru").format(remainderSum);
+    return { purchaseSumParsed, totalSumParsed, remainderSumParsed };
+  }, [filteredGoods]);
+
   return (
     <div className="pageWrapper">
       <div className={cl.Options}>
@@ -139,6 +154,28 @@ function Goods() {
       </div>
       <div className={cl.goodsWrapper}>
         <div className={cl.groupsWrapper}>
+          <div className={cl.TotalInfoWrapper}>
+            <p className={cl.TotalInfoTitle}>Общее количество:</p>
+            <div className={cl.TotalInfo}>
+              <p className={cl.TotalInfoText}>
+                {totalInfo.remainderSumParsed} шт.
+              </p>
+            </div>
+          </div>
+          <div className={cl.TotalInfoWrapper}>
+            <p className={cl.TotalInfoTitle}>Себестоимость товаров:</p>
+            <div className={cl.TotalInfo}>
+              <p className={cl.TotalInfoText}>
+                {totalInfo.purchaseSumParsed} тг
+              </p>
+            </div>
+          </div>
+          <div className={cl.TotalInfoWrapper}>
+            <p className={cl.TotalInfoTitle}>Стоимость товаров (розница):</p>
+            <div className={cl.TotalInfo}>
+              <p className={cl.TotalInfoText}>{totalInfo.totalSumParsed} тг</p>
+            </div>
+          </div>
           <p
             className={
               cl.GroupName + " " + (selectedSort === -2 ? cl.ActiveSort : "")

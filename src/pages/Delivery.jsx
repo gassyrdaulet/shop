@@ -636,6 +636,9 @@ function Delivery() {
                     type="sort"
                   />
                 </div>
+                <div className={cl.mobileFiltersItem}>
+                  <p>Найдено результатов: {filteredOrdersBySearch.length}</p>
+                </div>
               </div>
             </div>
             {deliveryStatus === "archive" ? (

@@ -408,11 +408,15 @@ function EditOrder() {
     for (let item of temp) {
       if (item.name === name) {
         if (name.startsWith("deliveryPrice")) {
-          const result = parseInt(
-            (value + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
-          );
+          const result = parseInt(value);
           const result2 = isNaN(result) ? 0 : result;
-          item.value = result2;
+          const result3 = result2 < 0 ? 0 : result2;
+          item.value = result3;
+          break;
+        }
+        if (item.name === "cellphone") {
+          const finalValue = value.replaceAll(" ", "");
+          item.value = finalValue;
           break;
         }
         item.value = value;
@@ -424,11 +428,9 @@ function EditOrder() {
 
   const handleDiscountChange = (value) => {
     const temp = { ...discount };
-    const result = parseInt(
-      (value + "").replace(/^0{2,}|^0.|[^0-9/]/gim, "").substring(0, 7)
-    );
-    const result2 = isNaN(result) ? 0 : result;
-    temp.amount = result2;
+    const parsedValue = parseInt(value);
+    const result = isNaN(parsedValue) ? 0 : parsedValue;
+    temp.amount = result;
     setDiscount(temp);
   };
 

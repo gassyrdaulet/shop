@@ -54,6 +54,9 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
 
   const backgroundColor = useMemo(() => {
     if (checked) {
+      if (order.status === "cancelled" || order.status === "returned") {
+        return "#58aa99";
+      }
       return "#58cf99";
     }
     if (order.status === "cancelled" || order.status === "returned") {

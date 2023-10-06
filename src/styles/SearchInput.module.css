@@ -1,10 +1,30 @@
 .SearchInput {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+.SearchInputInput {
   width: 100%;
   border-radius: 3px;
   border: 1px solid rgb(181, 181, 181);
   padding: 6px 10px;
 }
-.SearchInput:focus {
+.SearchInputInput:focus {
   outline: none;
   box-shadow: 0 0 4px rgb(73, 160, 253);
+}
+.EraseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  width: 25px;
+  /* border: 1px solid gray;
+  border-radius: 5px; */
+  position: absolute;
+  background-color: #f8f8f8;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }

@@ -1,9 +1,10 @@
 import cl from "../styles/Logo.module.css";
+import fox from "../assets/fevecfox.png";
 
 function Logo() {
   return (
     <div className={cl.mainWrapper}>
-      <p className={cl.Word}>SHOP</p>
+      <img src={fox} className={cl.logoImage} />
     </div>
   );
 }

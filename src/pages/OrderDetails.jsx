@@ -525,7 +525,7 @@ function OrderDetails() {
           cause,
           setProcessLoading,
           next: () => {
-            navigate("/delivery/new");
+            navigate(data.delivery === 1 ? "/delivery/new" : "/pickup/new");
           },
         });
       },

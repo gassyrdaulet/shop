@@ -361,6 +361,7 @@ function UserSummary() {
           <SearchInput
             placeholder="с"
             value={firstDate}
+            isDate={true}
             setValue={setFirstDate}
             className={cl.SearchInput}
             type="date"
@@ -368,6 +369,7 @@ function UserSummary() {
           <p>До:</p>
           <SearchInput
             placeholder="до"
+            isDate={true}
             value={secondDate}
             setValue={setSecondDate}
             className={cl.SearchInput}
@@ -410,6 +412,7 @@ function UserSummary() {
             <SearchInput
               placeholder="с"
               value={firstDate}
+              isDate={true}
               setValue={setFirstDate}
               className={cl.SearchInput}
               type="date"
@@ -417,6 +420,7 @@ function UserSummary() {
             <p>До:</p>
             <SearchInput
               placeholder="до"
+              isDate={true}
               value={secondDate}
               setValue={setSecondDate}
               className={cl.SearchInput}
