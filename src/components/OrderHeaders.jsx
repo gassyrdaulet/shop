@@ -36,6 +36,7 @@ function OrderHeaders({ markAll, allMarked, unmarkAll, dateType, status }) {
       <th>Адрес</th>
       <th>Комментарий</th>
       <th>{status === "archive" ? dateType : "Дата создания"}</th>
+      <th>План. дата</th>
       <th>Статус заказа</th>
     </tr>
   );

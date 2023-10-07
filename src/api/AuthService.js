@@ -17,8 +17,9 @@ export const errParser = (err) => {
     : err.response?.data?.message;
 };
 
-export const ping = async ({ setIsAuth, setIsAuthLoading }) => {
-  const token = await cookies.get(TOKEN_NAME);
+export const ping = async ({ setIsAuth, setIsAuthLoading, navigate }) => {
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   if (!token) {
     setIsAuthLoading(false);
     setIsAuth(false);
@@ -38,8 +39,11 @@ export const ping = async ({ setIsAuth, setIsAuthLoading }) => {
       }
       setIsAuth(true);
     })
-    .catch(() => {
-      logout({ setIsAuth });
+    .catch((e) => {
+      if (e?.response?.data?.logout) {
+        logout({ setIsAuth });
+      }
+      navigate("/error");
     })
     .finally(() => {
       setIsAuthLoading(false);
@@ -47,7 +51,8 @@ export const ping = async ({ setIsAuth, setIsAuthLoading }) => {
 };
 
 export const checkOrg = async ({ setIsNoOrg, setIsCheckOrgLoading }) => {
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   if (!token) {
     setIsCheckOrgLoading(false);
     return;
@@ -102,6 +107,7 @@ export const login = async ({
       cookies.set(data.cookie.name, data.cookie.value, {
         maxAge: data.cookie.maxAge,
       });
+      localStorage.setItem(data.cookie.name, data.cookie.value);
       Object.keys(data.user).forEach((key) => {
         localStorage.setItem(key, data.user[key]);
       });
@@ -210,7 +216,8 @@ export const confirmAccount = async ({
 
 export const getAPIToken = async (id) => {
   try {
-    const token = await cookies.get(TOKEN_NAME);
+    // const token = await cookies.get(TOKEN_NAME);
+    const token = localStorage.getItem(TOKEN_NAME);
     const { data } = await axios.post(
       `${SERVER_URL}/api/auth/token`,
       {
@@ -229,7 +236,8 @@ export const getAPIToken = async (id) => {
 };
 
 export const getUserData = async ({ setIsLoading, setUserData }) => {
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   setIsLoading(true);
   axios
     .get(`${SERVER_URL}/api/auth/getuserdata`, {
@@ -249,7 +257,8 @@ export const getUserData = async ({ setIsLoading, setUserData }) => {
 };
 
 export const editUserData = async ({ setIsLoading, inputs }) => {
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   setIsLoading(true);
   const body = {};
   inputs.forEach((item) => {

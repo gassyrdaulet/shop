@@ -108,6 +108,19 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
           : moment(order.creationdate).format("DD.MM.yyyy HH:mm")}
       </td>
       <td style={{ textAlign: "center" }}>
+        {moment(order.deliveryinfo.plannedDeliveryDate).format("DD.MM.yyyy")}
+        <br />
+        <br />
+        {moment(order.deliveryinfo.plannedDeliveryDate).isSame(moment(), "day")
+          ? "(Сегодня)"
+          : ""}
+        {moment(order.deliveryinfo.plannedDeliveryDate) <
+        moment().startOf("day")
+          ? "(Просрочено)"
+          : ""}
+      </td>
+
+      <td style={{ textAlign: "center" }}>
         {orderStatus ? `${orderStatus}` : ""} (ID: {order.id})
       </td>
     </tr>

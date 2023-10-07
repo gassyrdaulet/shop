@@ -3,10 +3,23 @@ import MyButton from "../components/MyButton";
 import useAuth from "../hooks/useAuth";
 import TextButton from "../components/TextButton";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { ping, checkOrg } from "../api/AuthService";
 
 function NoOrg() {
-  const { alert } = useAuth();
+  const {
+    alert,
+    setIsAuth,
+    setIsAuthLoading,
+    setIsNoOrg,
+    setIsCheckOrgLoading,
+  } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
+    ping({ setIsAuth, setIsAuthLoading, navigate });
+  }, []);
 
   return (
     <div className="pageWrapper">

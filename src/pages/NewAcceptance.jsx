@@ -371,7 +371,7 @@ function NewAcceptance() {
                                   type === "ac"
                                     ? good.inventories?.length > 0
                                       ? good.inventories[0].price
-                                      : 0
+                                      : good.purchase
                                     : good.price,
                                 quantity: 0,
                                 remainder: good.remainder,

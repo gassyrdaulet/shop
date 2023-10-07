@@ -13,7 +13,8 @@ export const setAlertOrganizationService = (variable) => {
 
 export const getCashbox = async ({ setCashboxLoading, setCashbox }) => {
   setCashboxLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getcashbox`, {
       headers: {
@@ -33,7 +34,8 @@ export const getCashbox = async ({ setCashboxLoading, setCashbox }) => {
 
 export const openCashbox = async ({ setCashboxLoading, next }) => {
   setCashboxLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/organization/newcashbox`,
@@ -58,11 +60,94 @@ export const openCashbox = async ({ setCashboxLoading, next }) => {
 
 export const closeCashbox = async ({ setProcessLoading, cashboxId, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/organization/closecashbox`,
       { cashboxId },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      alert("Успешно", data?.cashbox);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const addCashToCashbox = async ({ setProcessLoading, amount, next }) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/addcashtocashbox`,
+      { amount },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      alert("Успешно", data?.cashbox);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const removeCashFromCashbox = async ({
+  setProcessLoading,
+  amount,
+  next,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/removecashfromcashbox`,
+      { amount },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      alert("Успешно", data?.cashbox);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const closeAnyCashbox = async ({ setProcessLoading, next }) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/closeanycashbox`,
+      {},
       {
         headers: {
           [TOKEN_NAME]: token,
@@ -87,7 +172,8 @@ export const getOrgInfo = async ({
   setValue = () => {},
 }) => {
   setFetchLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getinfo`, {
       headers: {
@@ -111,7 +197,8 @@ export const getOrgInfo = async ({
 
 export const editOrgInfo = async ({ newData, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/organization/editorg`,
@@ -136,7 +223,8 @@ export const editOrgInfo = async ({ newData, setProcessLoading, next }) => {
 
 export const getManagers = async ({ setManagers, setManagersLoading }) => {
   setManagersLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getusers`, {
       headers: {
@@ -169,7 +257,8 @@ export const getManagersForSummary = async ({
   setManagersLoading,
 }) => {
   setManagersLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getusers`, {
       headers: {
@@ -216,7 +305,8 @@ export const getManagersForSummary = async ({
 
 export const getUsers = async ({ setUsers, setFetchLoading }) => {
   setFetchLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getusers`, {
       headers: {
@@ -241,7 +331,8 @@ export const addNewUser = async ({
   next,
 }) => {
   setAddNewUserLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   newUserInfo.id = id;
   axios
     .post(
@@ -275,7 +366,8 @@ export const editUser = async ({
   next,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   pickedUserInfo.id = editId;
   axios
     .post(
@@ -304,7 +396,8 @@ export const editUser = async ({
 
 export const deleteUser = async ({ deleteId, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/organization/deleteuser`,
@@ -331,7 +424,8 @@ export const deleteUser = async ({ deleteId, setProcessLoading, next }) => {
 
 export const getDelivers = async ({ setDelivers, setDeliversLoading }) => {
   setDeliversLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/organization/getusers`, {
       headers: {

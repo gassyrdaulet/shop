@@ -21,12 +21,15 @@ import moment from "moment";
 import {
   BiArrowToRight,
   BiCheckCircle,
+  BiDownArrow,
   BiLock,
+  BiLockOpen,
   BiMinusCircle,
   BiMoney,
   BiPlusCircle,
   BiSad,
   BiSearch,
+  BiUpArrow,
 } from "react-icons/bi";
 import CheckBox from "../components/CheckBox";
 import NumKeyBoard from "../components/NumKeyBoard";
@@ -46,6 +49,9 @@ import {
   openCashbox,
   closeCashbox,
   getOrgInfo,
+  closeAnyCashbox,
+  addCashToCashbox,
+  removeCashFromCashbox,
 } from "../api/OrganizationService";
 import { AiFillCloseCircle } from "react-icons/ai";
 
@@ -63,6 +69,7 @@ function Cash() {
   const [payment, setPayment] = useState([]);
   const [search, setSearch] = useState("");
   const [returnId, setReturnId] = useState("");
+  const [controlCashAmount, setControlCashAmount] = useState("0");
   const [barcodeInput, setBarcodeInput] = useState("");
   const [manager, setManager] = useState(-1);
   const [selectedGroup, setSelectedGroup] = useState({});
@@ -76,6 +83,7 @@ function Cash() {
   const [setAsideModal, setSetAsideModal] = useState(false);
   const [returnModal, setReturnModal] = useState(false);
   const [cashBoxModal, setCashBoxModal] = useState(false);
+  const [controlCashModal, setControlCashModal] = useState(false);
   const [printCheck, setPrintCheck] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState();
@@ -87,7 +95,7 @@ function Cash() {
   const buttons = [
     {
       disabled: processLoading,
-      icon: <BsCashCoin />,
+      icon: <BiLock />,
       text: "Моя смена",
       onClick: () => setCashBoxModal(true),
     },
@@ -96,6 +104,12 @@ function Cash() {
       icon: <BiSad />,
       text: "Возврат по чеку",
       onClick: () => setReturnModal(true),
+    },
+    {
+      disabled: processLoading,
+      icon: <BsCashCoin />,
+      text: "Контроль налички",
+      onClick: () => setControlCashModal(true),
     },
   ];
 
@@ -389,6 +403,27 @@ function Cash() {
     }
   }, [goodsForSell]);
 
+  const cashSum = useMemo(() => {
+    try {
+      if (cashboxLoading) {
+        return 0;
+      }
+      const remove = "remove";
+      let tempSum = 0;
+      cashbox.cash.forEach((item) => {
+        if (item.type === remove) {
+          tempSum -= item.amount;
+          return;
+        }
+        tempSum += item.amount;
+      });
+      return tempSum;
+    } catch (e) {
+      console.log("Cashbox Sum Error:", e);
+      return 0;
+    }
+  }, [cashbox]);
+
   const sumWithDiscount = useMemo(() => {
     try {
       let tempSum =
@@ -614,6 +649,13 @@ function Cash() {
     },
   ];
 
+  const handleControlCashAmount = useCallback((value) => {
+    const parsedValue = parseInt(value);
+    const isNaNControl = isNaN(parsedValue) ? 0 : parsedValue;
+    const negativeControl = Math.abs(isNaNControl);
+    setControlCashAmount(negativeControl);
+  }, []);
+
   if (window.innerHeight < 300 || window.innerWidth < 900) {
     return (
       <div className="pageWrapper" style={{ justifyContent: "flex-start" }}>
@@ -681,15 +723,27 @@ function Cash() {
             </p>
           </div>
           <Button
-            icon={<BiLock />}
+            icon={<BiLockOpen />}
             disabled={processLoading}
-            text="Открыть"
+            text="Открыть новую кассу"
             onClick={() => {
               openCashbox({
                 setCashboxLoading,
                 next: () => {
                   navigate(0);
                 },
+              });
+            }}
+          />
+          <Button
+            style={{ marginTop: 10 }}
+            icon={<BiLock />}
+            disabled={processLoading}
+            text="Закрыть текущую открытую кассу"
+            onClick={() => {
+              closeAnyCashbox({
+                setProcessLoading: setCashboxLoading,
+                next: () => {},
               });
             }}
           />
@@ -1315,7 +1369,7 @@ function Cash() {
           Дата открытия:{" "}
           {moment(cashbox?.openeddate).format("HH:mm DD.MM.yyyy")}
         </p>
-        <p>Наличка: {cashbox?.cash ? cashbox.cash : 0} тг</p>
+        <p>Наличка: {cashSum} тг</p>
         <div
           style={{
             display: "flex",
@@ -1328,7 +1382,7 @@ function Cash() {
             disabled={processLoading}
             text="Закрыть смену"
             onClick={() => {
-              if (window.confirm("Вы уверены что хоите закрыть эту смену?")) {
+              if (window.confirm("Вы уверены что хотите закрыть эту смену?")) {
                 closeCashbox({
                   setProcessLoading,
                   cashboxId: cashbox.id,
@@ -1339,6 +1393,72 @@ function Cash() {
               }
             }}
             icon={<AiFillCloseCircle />}
+          />
+        </div>
+      </Modal>
+      <Modal
+        noEscape={processLoading}
+        setModalVisible={setControlCashModal}
+        modalVisible={controlCashModal}
+      >
+        <p style={{ marginBottom: 20 }}>Добавить или снять наличные</p>
+        <p>ID: {cashbox?.id}</p>
+        <p>Наличка: {cashSum} тг</p>
+        <LegendInput
+          disabled={processLoading}
+          type="text"
+          legend="Сумма"
+          value={controlCashAmount}
+          setValue={(v) => {
+            handleControlCashAmount(v);
+          }}
+          inputMode="numeric"
+        />
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            justifyContent: "space-between",
+            margin: "10px 0",
+          }}
+        >
+          <Button
+            style={{ minWidth: 100, maxWidth: 100, width: 100 }}
+            disabled={processLoading}
+            text="Доб. нал."
+            onClick={() => {
+              if (window.confirm("Подтвердите действие: Добавление наличных")) {
+                addCashToCashbox({
+                  setProcessLoading,
+                  amount: controlCashAmount,
+                  next: () => {
+                    getCashbox({ setCashboxLoading, setCashbox });
+                    setControlCashModal(false);
+                    setControlCashAmount("0");
+                  },
+                });
+              }
+            }}
+            icon={<BiDownArrow />}
+          />
+          <Button
+            style={{ minWidth: 100, maxWidth: 100, width: 100 }}
+            disabled={processLoading}
+            text="Снять нал."
+            onClick={() => {
+              if (window.confirm("Подтвердите действие: Снятие наличных")) {
+                removeCashFromCashbox({
+                  setProcessLoading,
+                  amount: controlCashAmount,
+                  next: () => {
+                    getCashbox({ setCashboxLoading, setCashbox });
+                    setControlCashModal(false);
+                    setControlCashAmount("0");
+                  },
+                });
+              }
+            }}
+            icon={<BiUpArrow />}
           />
         </div>
       </Modal>

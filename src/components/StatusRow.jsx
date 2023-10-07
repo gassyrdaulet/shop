@@ -19,7 +19,7 @@ function StatusRow({
           : "rgb(41, 116, 208)",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: mobile ? "center" : "flex-start",
         flexDirection: mobile ? "column" : "row",
         padding: 10,
         textAlign: "start",

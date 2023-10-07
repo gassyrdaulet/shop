@@ -19,7 +19,8 @@ export const newAcceptance = async ({
   next,
 }) => {
   setNewAcceptLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/warehouse/newaccept`,
@@ -49,7 +50,8 @@ export const newWriteOff = async ({
   next,
 }) => {
   setNewAcceptLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/warehouse/newwriteoff`,
@@ -73,7 +75,8 @@ export const newWriteOff = async ({
 
 export const getInventory = async ({ setInventory, setIsInvLoading, type }) => {
   setIsInvLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/warehouse/getinventory`, {
       params: {
@@ -111,7 +114,8 @@ export const getInventoryDetails = async ({
   id,
 }) => {
   setIsLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/warehouse/getinventorydetails`, {
       params: {

@@ -11,6 +11,7 @@ import { setAlertGoodService } from "./api/GoodService";
 import { setAlertWarehouseService } from "./api/WarehouseService";
 import { setAlertOrganizationService } from "./api/OrganizationService";
 import { setAlertOrderService } from "./api/OrderService";
+import { useNavigate } from "react-router-dom";
 
 const { PING_MS } = config;
 
@@ -21,6 +22,7 @@ export default function App() {
   const [isNoOrg, setIsNoOrg] = useState(false);
   const [fixed, setFixed] = useState(false);
   const [alerts, setAlerts] = useState([]);
+  const navigate = useNavigate();
 
   const alert = useCallback(async (title = "", text = "") => {
     setAlerts((alerts) => {
@@ -52,10 +54,10 @@ export default function App() {
   }, [alerts]);
 
   useEffect(() => {
-    ping({ setIsAuth, setIsAuthLoading });
+    ping({ setIsAuth, setIsAuthLoading, navigate });
     const interval = setInterval(() => {
+      ping({ setIsAuth, setIsAuthLoading, navigate });
       checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
-      ping({ setIsAuth, setIsAuthLoading });
     }, PING_MS);
     return () => clearInterval(interval);
   }, []);

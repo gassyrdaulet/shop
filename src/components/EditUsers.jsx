@@ -149,6 +149,7 @@ function EditUsers() {
                     <th>Кладовщик</th>
                     <th>Kaspi магазин</th>
                     <th>Редактирование заказов</th>
+                    <th>Возврат заказов</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -197,6 +198,9 @@ function EditUsers() {
                           </td>
                           <td>
                             <CrossCheck bool={user.editorder} />
+                          </td>
+                          <td>
+                            <CrossCheck bool={user.returnorder} />
                           </td>
                           <td style={{ minWidth: 100 }}>
                             <div
@@ -388,6 +392,16 @@ function EditUsers() {
             disabled={processLoading}
             onChange={(e) => {
               handleChange(e.target.checked, "editorder");
+            }}
+          />
+        </div>
+        <div style={settingRow}>
+          <p>Возврат заказов</p>
+          <CheckBox
+            checked={pickedUser.returnorder}
+            disabled={processLoading}
+            onChange={(e) => {
+              handleChange(e.target.checked, "returnorder");
             }}
           />
         </div>

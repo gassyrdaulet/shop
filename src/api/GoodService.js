@@ -13,7 +13,8 @@ export const setAlertGoodService = (variable) => {
 
 export const getInvCntrlType = async () => {
   try {
-    const token = await cookies.get(TOKEN_NAME);
+    // const token = await cookies.get(TOKEN_NAME);
+    const token = localStorage.getItem(TOKEN_NAME);
     const { data } = await axios.get(
       `${SERVER_URL}/api/organization/getinvcntrltype`,
       {
@@ -32,7 +33,8 @@ export const getInvCntrlType = async () => {
 
 export const getGoods = async ({ setFetchGoodsLoading, setGoods }) => {
   setFetchGoodsLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   const invcntrltype = await getInvCntrlType();
   axios
     .get(`${SERVER_URL}/api/goods/all`, {
@@ -44,11 +46,13 @@ export const getGoods = async ({ setFetchGoodsLoading, setGoods }) => {
       const temp = data.map((item) => {
         const remainderTemp = item.remainder;
         if (invcntrltype === "lifo") {
-          item.purchase = remainderTemp?.length ? remainderTemp[0].price : 0;
+          item.purchase = remainderTemp?.length
+            ? remainderTemp[0].price
+            : item.lastpurchase;
         } else if (invcntrltype === "fifo") {
           item.purchase = remainderTemp?.length
             ? remainderTemp[remainderTemp.length - 1].price
-            : 0;
+            : item.lastpurchase;
         }
         let quantity = 0;
         if (remainderTemp?.length) {
@@ -72,7 +76,8 @@ export const getGoods = async ({ setFetchGoodsLoading, setGoods }) => {
 
 export const getRelations = async ({ setFetchLoading, setRelations }) => {
   setFetchLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/goods/getrelations`, {
       headers: {
@@ -92,7 +97,8 @@ export const getRelations = async ({ setFetchLoading, setRelations }) => {
 
 export const getGroups = async ({ setGroupsLoading, setGroups }) => {
   setGroupsLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/goods/groups`, {
       headers: {
@@ -117,7 +123,8 @@ export const newGroup = async ({
   update,
 }) => {
   setNewGroupLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/newgroup`,
@@ -151,7 +158,8 @@ export const newRelation = async ({
   next,
 }) => {
   setNewRelationLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/newrelation`,
@@ -176,7 +184,8 @@ export const newRelation = async ({
 
 export const deleteGroup = async ({ setProcessLoading, id, update }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/deletegroup`,
@@ -205,7 +214,8 @@ export const deleteRelation = async ({
   next,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/deleterelation`,
@@ -230,7 +240,8 @@ export const deleteRelation = async ({
 
 export const deleteGood = async ({ setDeleteGoodLoading, id, update }) => {
   setDeleteGoodLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/deletegood`,
@@ -259,7 +270,8 @@ export const fetchGroupInfo = async ({
   id,
 }) => {
   setEditGroupInfoLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/fetchgroup`,
@@ -288,7 +300,8 @@ export const editGroup = async ({
   update,
 }) => {
   setEditGroupLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/editgroup`,
@@ -318,7 +331,8 @@ export const editRelation = async ({
   next,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/editrelation`,
@@ -350,7 +364,8 @@ export const newGood = async ({ inputs, setNewGoodLoading, update }) => {
         : input.value;
   });
   setNewGoodLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(`${SERVER_URL}/api/goods/newgood`, body, {
       headers: {
@@ -377,7 +392,8 @@ export const editGood = async ({ inputs, setEditGoodLoading, id }) => {
         : input.value;
   });
   setEditGoodLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/editgood`,
@@ -406,7 +422,8 @@ export const fetchGoodInfo = async ({
   id,
 }) => {
   setFetchLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/goods/getgood`,
@@ -444,7 +461,8 @@ export const fetchGoodInfo = async ({
 
 export const getBarcode = async ({ setBarcodeLoading, setBarcode }) => {
   setBarcodeLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/goods/getbarcode`, {
       headers: {
@@ -466,7 +484,8 @@ export const uploadXLSX = async ({ file, setImportLoading, next }) => {
   setImportLoading(true);
   const formData = new FormData();
   formData.append("file", file, file.name);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(`${SERVER_URL}/api/goods/uploadxlsx`, formData, {
       headers: {
@@ -491,7 +510,8 @@ export const getGoodsAndGroups = async ({
   next,
 }) => {
   try {
-    const token = await cookies.get(TOKEN_NAME);
+    // const token = await cookies.get(TOKEN_NAME);
+    const token = localStorage.getItem(TOKEN_NAME);
     const invcntrltype = await getInvCntrlType();
     setFetchLoading(true);
     const { data } = await axios.get(`${SERVER_URL}/api/goods/all`, {
@@ -502,11 +522,13 @@ export const getGoodsAndGroups = async ({
     const temp = data.map((item) => {
       const remainderTemp = item.remainder;
       if (invcntrltype === "lifo") {
-        item.purchase = remainderTemp?.length ? remainderTemp[0].price : 0;
+        item.purchase = remainderTemp?.length
+          ? remainderTemp[0].price
+          : item.lastpurchase;
       } else if (invcntrltype === "fifo") {
         item.purchase = remainderTemp?.length
           ? remainderTemp[remainderTemp.length - 1].price
-          : 0;
+          : item.lastpurchase;
       }
       let quantity = 0;
       if (remainderTemp?.length) {

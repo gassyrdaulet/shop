@@ -45,7 +45,7 @@ function Delivery() {
   const [deliverForSend, setDeliverForSend] = useState(-1);
   const [managers, setManagers] = useState([]);
   const [manager, setManager] = useState(-1);
-  const [sort, setSort] = useState(1);
+  const [sort, setSort] = useState(4);
   const [finishedOrdersLoading, setFinishedOrdersLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [finishedOrders, setFinishedOrders] = useState([]);
@@ -287,6 +287,10 @@ function Delivery() {
         name: "По статусам",
         id: 3,
       },
+      {
+        name: "По планируемой дате",
+        id: 4,
+      },
     ];
   }, []);
 
@@ -351,6 +355,18 @@ function Delivery() {
       } else if (sort === 3) {
         const temp = [...filteredOrders].sort((a, b) => {
           return -a.status.localeCompare(b.status);
+        });
+        return temp;
+      } else if (sort === 4) {
+        const temp = [...filteredOrders].sort((a, b) => {
+          let result = 0;
+          if (moment(a.creationdate) < moment(b.creationdate)) {
+            result = 1;
+          }
+          if (moment(a.creationdate) > moment(b.creationdate)) {
+            result = -1;
+          }
+          return result;
         });
         return temp;
       }
@@ -460,14 +476,15 @@ function Delivery() {
             }
           });
           let sum = 0;
-          goods.forEach(
-            (good) =>
-              (sum +=
-                good.quantity * good.price -
-                (good.discount.type === "percent"
-                  ? ((good.price * good.discount.amount) / 100) * good.quantity
-                  : good.discount.amount * good.quantity))
-          );
+          let goodsParsed = "";
+          goods.forEach((good) => {
+            goodsParsed += `${good.quantity}шт. ${good.name}; `;
+            sum +=
+              good.quantity * good.price -
+              (good.discount.type === "percent"
+                ? ((good.price * good.discount.amount) / 100) * good.quantity
+                : good.discount.amount * good.quantity);
+          });
           const deliveryPrice = parseInt(
             deliveryinfo["deliveryPriceForCustomer"]
           );
@@ -484,6 +501,7 @@ function Delivery() {
             sum: sumWithDiscount,
             paymentSum: paymentSum,
             status: order.status,
+            goods: goodsParsed,
             countable: order.countable === 1,
           });
         }
@@ -821,6 +839,7 @@ function Delivery() {
                 <th>№</th>
                 <th>Входит в отчет</th>
                 <th>Адрес</th>
+                <th>Товар</th>
                 <th>Статус</th>
                 <th>Стоимость доставки</th>
                 <th>Сумма заказа</th>
@@ -867,6 +886,15 @@ function Delivery() {
                         }}
                       >
                         {item.address}
+                      </td>
+                      <td
+                        style={{
+                          width: "inherit",
+                          maxWidth: "inherit",
+                          minWidth: "100px",
+                        }}
+                      >
+                        {item.goods}
                       </td>
                       <td style={{ textAlign: "center" }}>
                         {statusesRussian[item.status]}

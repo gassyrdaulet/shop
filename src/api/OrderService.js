@@ -19,7 +19,8 @@ export const getOrderDetails = async ({
   next = () => {},
 }) => {
   setFetchLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/orders/getdetails`, {
       params: { id },
@@ -45,7 +46,8 @@ export const getOrders = async ({
   status = "all",
 }) => {
   setOrdersLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .get(`${SERVER_URL}/api/orders/getorders`, {
       params: { status },
@@ -73,7 +75,8 @@ export const getFinishedOrders = async ({
   delivery = true,
 }) => {
   setFinishedOrdersLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/getfinished`,
@@ -102,7 +105,8 @@ export const getFinishedOrders = async ({
 
 export const newOrder = async ({ order, setNewOrderLoading, next }) => {
   setNewOrderLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/neworder`,
@@ -127,7 +131,8 @@ export const newOrder = async ({ order, setNewOrderLoading, next }) => {
 
 export const isThereOrder = async ({ id, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/isthereorder`,
@@ -159,7 +164,8 @@ export const issueCash = async ({
 }) => {
   try {
     setProcessLoading(true);
-    const token = await cookies.get(TOKEN_NAME);
+    // const token = await cookies.get(TOKEN_NAME);
+    const token = localStorage.getItem(TOKEN_NAME);
     await axios.post(
       `${SERVER_URL}/api/orders/editorder`,
       { order, orderId: id },
@@ -187,7 +193,8 @@ export const issueCash = async ({
 
 export const cashOrder = async ({ order, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/cashorder`,
@@ -212,7 +219,8 @@ export const cashOrder = async ({ order, setProcessLoading, next }) => {
 
 export const editOrder = async ({ order, setEditLoading, id, next }) => {
   setEditLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/editorder`,
@@ -242,7 +250,8 @@ export const editOrderManager = async ({
   next,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/editmanager`,
@@ -272,7 +281,8 @@ export const sendDeliver = async ({
   orderIds,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/senddeliver`,
@@ -297,7 +307,8 @@ export const sendDeliver = async ({
 
 export const issueOrder = async ({ payment, id, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/issueorder`,
@@ -322,7 +333,8 @@ export const issueOrder = async ({ payment, id, setProcessLoading, next }) => {
 
 export const issuePickup = async ({ payment, id, setProcessLoading, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/issuepickup`,
@@ -353,7 +365,8 @@ export const finishOrder = async ({
   deliveryList,
 }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/finishorder`,
@@ -378,7 +391,8 @@ export const finishOrder = async ({
 
 export const cancelOrder = async ({ id, setProcessLoading, cause, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/cancelorder`,
@@ -403,7 +417,8 @@ export const cancelOrder = async ({ id, setProcessLoading, cause, next }) => {
 
 export const recreateOrder = async ({ id, setProcessLoading, cause, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/recreateorder`,
@@ -428,7 +443,8 @@ export const recreateOrder = async ({ id, setProcessLoading, cause, next }) => {
 
 export const returnOrder = async ({ id, setProcessLoading, cause, next }) => {
   setProcessLoading(true);
-  const token = await cookies.get(TOKEN_NAME);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/orders/returnorder`,
