@@ -19,7 +19,7 @@ function NoOrg() {
   useEffect(() => {
     checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
     ping({ setIsAuth, setIsAuthLoading, navigate });
-  }, []);
+  }, [navigate, setIsAuth, setIsAuthLoading, setIsNoOrg, setIsCheckOrgLoading]);
 
   return (
     <div className="pageWrapper">

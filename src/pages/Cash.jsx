@@ -222,7 +222,7 @@ function Cash() {
       return;
     }
     setFixed(true);
-  }, [setFixed, window.innerHeight, window.innerWidth]);
+  }, [setFixed]);
 
   useEffect(() => {
     if (!orderData) {
@@ -422,7 +422,7 @@ function Cash() {
       console.log("Cashbox Sum Error:", e);
       return 0;
     }
-  }, [cashbox]);
+  }, [cashbox, cashboxLoading]);
 
   const sumWithDiscount = useMemo(() => {
     try {

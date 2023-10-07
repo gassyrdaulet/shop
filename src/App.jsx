@@ -60,7 +60,7 @@ export default function App() {
       checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
     }, PING_MS);
     return () => clearInterval(interval);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     setAlertGoodService(alert);

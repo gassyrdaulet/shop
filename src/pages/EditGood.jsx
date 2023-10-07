@@ -28,25 +28,23 @@ function EditGood() {
     getGroups({
       setGroupsLoading,
       setGroups: (data) => {
-        const temp = [...inputs];
-        for (let input of temp) {
-          if (input.id === 2) {
-            input.list = [
-              { value: "-1", name: "Оставить без группы" },
-              ...data.map((group) => {
-                return { value: group.id, name: group.name };
-              }),
-            ];
+        setInputs((prev) => {
+          const temp = [...prev];
+          for (let input of temp) {
+            if (input.id === 2) {
+              input.list = [
+                { value: "-1", name: "Оставить без группы" },
+                ...data.map((group) => {
+                  return { value: group.id, name: group.name };
+                }),
+              ];
+            }
           }
-        }
-        setInputs([...temp]);
+          return temp;
+        });
       },
     });
-  }, []);
-
-  useEffect(() => {
-    fetchGoodInfo({ inputs, setInputs, setFetchLoading, id: params.id });
-  }, []);
+  }, [params.id]);
 
   const buttons = [
     {
@@ -102,6 +100,10 @@ function EditGood() {
       name: "barcode",
     },
   ]);
+
+  useEffect(() => {
+    fetchGoodInfo({ setInputs, setFetchLoading, id: params.id });
+  }, [params.id]);
 
   const handleChange = (id, value) => {
     const temp = [...inputs];

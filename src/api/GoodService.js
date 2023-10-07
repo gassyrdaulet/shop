@@ -1,10 +1,10 @@
 import axios from "axios";
 import config from "../config/config.json";
-import Cookies from "universal-cookie";
+// import Cookies from "universal-cookie";
 import { errParser } from "./AuthService";
 
 const { SERVER_URL, TOKEN_NAME } = config;
-const cookies = new Cookies();
+// const cookies = new Cookies();
 let alert;
 
 export const setAlertGoodService = (variable) => {
@@ -415,12 +415,7 @@ export const editGood = async ({ inputs, setEditGoodLoading, id }) => {
     });
 };
 
-export const fetchGoodInfo = async ({
-  inputs,
-  setInputs,
-  setFetchLoading,
-  id,
-}) => {
+export const fetchGoodInfo = async ({ setInputs, setFetchLoading, id }) => {
   setFetchLoading(true);
   // const token = await cookies.get(TOKEN_NAME);
   const token = localStorage.getItem(TOKEN_NAME);
@@ -435,21 +430,23 @@ export const fetchGoodInfo = async ({
       }
     )
     .then(({ data }) => {
-      const temp = [...inputs];
-      temp.forEach((input) => {
-        if (input.name === "series") {
+      setInputs((prev) => {
+        const temp = [...prev];
+        temp.forEach((input) => {
+          if (input.name === "series") {
+            if (data[input.name] === null || data[input.name] === undefined) {
+              input.value = "-1";
+              return;
+            }
+          }
           if (data[input.name] === null || data[input.name] === undefined) {
-            input.value = "-1";
+            input.value = "";
             return;
           }
-        }
-        if (data[input.name] === null || data[input.name] === undefined) {
-          input.value = "";
-          return;
-        }
-        input.value = data[input.name];
+          input.value = data[input.name];
+        });
+        return temp;
       });
-      setInputs(temp);
     })
     .catch((err) => {
       alert("Ошибка", errParser(err));

@@ -1,10 +1,10 @@
 import axios from "axios";
 import config from "../config/config.json";
-import Cookies from "universal-cookie";
+// import Cookies from "universal-cookie";
 import { errParser } from "./AuthService";
 
 const { SERVER_URL, TOKEN_NAME } = config;
-const cookies = new Cookies();
+// const cookies = new Cookies();
 let alert;
 
 export const setAlertOrganizationService = (variable) => {
