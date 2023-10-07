@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { publicRoutes, userRoutes, userRoutes2 } from "../router";
+import { publicRoutes, userRoutes, userRoutes2, errorRoutes } from "../router";
 import useAuth from "../hooks/useAuth";
 import { useEffect } from "react";
 import { checkOrg } from "../api/AuthService";
@@ -12,13 +12,22 @@ function AppRouter() {
     setIsNoOrg,
     isCheckOrgLoading,
     setIsCheckOrgLoading,
+    isError,
   } = useAuth();
 
   useEffect(() => {
     checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
   }, [setIsNoOrg, isAuth, setIsCheckOrgLoading]);
 
-  return isAuth ? (
+  return isError ? (
+    <span>
+      <Routes>
+        {errorRoutes.map(({ path, element }) => (
+          <Route path={path} element={element} key={path} />
+        ))}
+      </Routes>
+    </span>
+  ) : isAuth ? (
     isNoOrg ? (
       <span>
         {isCheckOrgLoading ? (
@@ -35,7 +44,11 @@ function AppRouter() {
             }}
           >
             <div
-              style={{ width: "100%", height: 50, backgroundColor: "#dedede" }}
+              style={{
+                width: "100%",
+                height: 50,
+                backgroundColor: "#dedede",
+              }}
             ></div>
             <Loading />
             Проверка аутентификации
@@ -65,7 +78,11 @@ function AppRouter() {
             }}
           >
             <div
-              style={{ width: "100%", height: 50, backgroundColor: "#dedede" }}
+              style={{
+                width: "100%",
+                height: 50,
+                backgroundColor: "#dedede",
+              }}
             ></div>
             <Loading />
             Проверка аутентификации

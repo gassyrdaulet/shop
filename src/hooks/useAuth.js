@@ -14,6 +14,8 @@ export default function useAuth() {
     setIsCheckOrgLoading,
     fixed,
     setFixed,
+    isError,
+    setIsError,
   } = useContext(AuthContext);
   return {
     setIsAuth,
@@ -27,5 +29,7 @@ export default function useAuth() {
     setIsCheckOrgLoading,
     fixed,
     setFixed,
+    isError,
+    setIsError,
   };
 }

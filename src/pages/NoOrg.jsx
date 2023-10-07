@@ -13,13 +13,21 @@ function NoOrg() {
     setIsAuthLoading,
     setIsNoOrg,
     setIsCheckOrgLoading,
+    setIsError,
   } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
-    ping({ setIsAuth, setIsAuthLoading, navigate });
-  }, [navigate, setIsAuth, setIsAuthLoading, setIsNoOrg, setIsCheckOrgLoading]);
+    ping({ setIsAuth, setIsAuthLoading, setIsError });
+  }, [
+    navigate,
+    setIsAuth,
+    setIsAuthLoading,
+    setIsNoOrg,
+    setIsCheckOrgLoading,
+    setIsError,
+  ]);
 
   return (
     <div className="pageWrapper">

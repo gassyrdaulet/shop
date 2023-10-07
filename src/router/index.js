@@ -66,3 +66,8 @@ export const publicRoutes = [
   },
   { path: "/*", element: <Navigate to="/auth"></Navigate> },
 ];
+
+export const errorRoutes = [
+  { path: "/error", element: <Error></Error> },
+  { path: "/*", element: <Navigate to="/error"></Navigate> },
+];

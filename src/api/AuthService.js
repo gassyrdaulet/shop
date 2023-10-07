@@ -17,7 +17,7 @@ export const errParser = (err) => {
     : err.response?.data?.message;
 };
 
-export const ping = async ({ setIsAuth, setIsAuthLoading, navigate }) => {
+export const ping = async ({ setIsAuth, setIsAuthLoading, setIsError }) => {
   // const token = await cookies.get(TOKEN_NAME);
   const token = localStorage.getItem(TOKEN_NAME);
   if (!token) {
@@ -38,12 +38,13 @@ export const ping = async ({ setIsAuth, setIsAuthLoading, navigate }) => {
         return;
       }
       setIsAuth(true);
+      setIsError(false);
     })
     .catch((e) => {
       if (e?.response?.data?.logout) {
         logout({ setIsAuth });
       }
-      navigate("/error");
+      setIsError(true);
     })
     .finally(() => {
       setIsAuthLoading(false);
