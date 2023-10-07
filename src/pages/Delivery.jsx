@@ -901,7 +901,12 @@ function Delivery() {
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <input
-                          style={{ maxWidth: 150, width: 100, minWidth: 50 }}
+                          style={{
+                            textAlign: "center",
+                            maxWidth: 80,
+                            width: 80,
+                            minWidth: 50,
+                          }}
                           type="text"
                           inputMode="text"
                           value={item.deliveryPay}
@@ -949,7 +954,7 @@ function Delivery() {
                     : 0}{" "}
                   шт.
                 </td>
-                <td style={{ fontWeight: "bold" }} colSpan={2}>
+                <td style={{ fontWeight: "bold" }} colSpan={3}>
                   Всего:{" "}
                   {isNaN(
                     payoffDeliveriesSum?.paymentSums -
