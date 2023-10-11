@@ -11,6 +11,8 @@ import {
   BsGear,
   BsPersonGear,
   BsPencil,
+  BsTag,
+  BsCarFront,
 } from "react-icons/bs";
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
@@ -20,7 +22,7 @@ import HeaderIcon from "./HeaderIcon";
 import Modal from "./Modal";
 import MyButton from "./MyButton";
 import { useNavigate, useLocation } from "react-router-dom";
-import { BiUser } from "react-icons/bi";
+import { BiListCheck, BiUser } from "react-icons/bi";
 
 function Header() {
   const { setIsAuth } = useAuth();
@@ -37,8 +39,21 @@ function Header() {
     {
       name: "Товары",
       icon: <BsBox2Heart />,
-      onClick: () => navigate("/goods"),
       path: "/goods",
+      dropmenu: [
+        {
+          icon: <BiListCheck />,
+          name: "Остатки",
+          onClick: () => navigate("/goods/remainders"),
+          path: "/goods/remainders",
+        },
+        {
+          icon: <BsTag />,
+          name: "Этикетки",
+          onClick: () => navigate("/goods/labels"),
+          path: "/goods/labels",
+        },
+      ],
     },
     {
       name: "Доставки",
@@ -87,6 +102,12 @@ function Header() {
           name: "По сотрудникам",
           onClick: () => navigate("/summaries/usersummary"),
           path: "/summaries/usersummary",
+        },
+        {
+          icon: <BsCarFront />,
+          name: "Ист. расчетов",
+          onClick: () => navigate("/summaries/deliverylists"),
+          path: "/summaries/deliverylists",
         },
       ],
     },

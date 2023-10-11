@@ -32,6 +32,31 @@ export const getCashbox = async ({ setCashboxLoading, setCashbox }) => {
     });
 };
 
+export const newOrganization = async ({ setIsLoading, name, next }) => {
+  setIsLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/neworganization`,
+      { name },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(() => {
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+};
+
 export const openCashbox = async ({ setCashboxLoading, next }) => {
   setCashboxLoading(true);
   // const token = await cookies.get(TOKEN_NAME);

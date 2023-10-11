@@ -1,18 +1,30 @@
 {
   "name": "shop",
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.4.0",
+    "html-to-image": "^1.11.11",
+    "jsbarcode": "^3.11.5",
+    "jsrsasign": "^10.8.6",
     "moment": "^2.29.4",
+    "pdf-lib": "^1.17.1",
+    "qz-tray": "^2.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
     "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
+    "rsa-key": "^0.0.6",
     "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4"
   },

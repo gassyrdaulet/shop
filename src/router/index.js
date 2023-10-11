@@ -20,9 +20,12 @@ import Settings from "../pages/Settings";
 import Pickup from "../pages/Pickup";
 import Cash from "../pages/Cash";
 import Registration from "../pages/Registration";
+import Labels from "../pages/Labels";
+import DeliveryLists from "../pages/DeliveryLists";
 
 export const userRoutes = [
-  { path: "/goods", element: <Goods></Goods> },
+  { path: "/goods/remainders", element: <Goods></Goods> },
+  { path: "/goods/labels", element: <Labels></Labels> },
   { path: "/goods/new", element: <NewGood></NewGood> },
   { path: "/goods/edit/:id", element: <EditGood></EditGood> },
   { path: "/delivery/:deliveryStatus", element: <Delivery></Delivery> },
@@ -39,6 +42,10 @@ export const userRoutes = [
     element: <InventoryDetails></InventoryDetails>,
   },
   { path: "/summaries/usersummary", element: <UserSummary></UserSummary> },
+  {
+    path: "/summaries/deliverylists",
+    element: <DeliveryLists></DeliveryLists>,
+  },
   { path: "/settings/:settingstype", element: <Settings></Settings> },
   { path: "/", element: <Navigate to="/main"></Navigate> },
   { path: "/noorg", element: <Navigate to="/main"></Navigate> },

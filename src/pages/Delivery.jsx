@@ -59,6 +59,8 @@ function Delivery() {
   const [dateType, setDateType] = useState(1);
   const [markedIds, setMarkedIds] = useState({});
   const [payoffDeliveriesList, setPayOffDeliveriesList] = useState([]);
+  const [deliveriesListComment, setDeliveriesListComment] = useState("");
+  const [cashFromDeliver, setCashFromDeliver] = useState("0");
 
   useEffect(() => {
     const types = ["new", "processing", "delivering", "archive"];
@@ -130,7 +132,9 @@ function Delivery() {
           next: () => {
             navigate(0);
           },
+          comment: deliveriesListComment,
           deliveryList: payoffDeliveriesList,
+          cash: cashFromDeliver,
         });
       },
     },
@@ -524,10 +528,10 @@ function Delivery() {
         cancelledSum++;
         return;
       }
-      paymentSums += item.paymentSum;
+      paymentSums += parseInt(item.paymentSum);
       countableSum += item.countable ? 1 : 0;
-      orderSums += item.sum;
-      deliveryCosts += item.deliveryPay;
+      orderSums += parseInt(item.sum);
+      deliveryCosts += parseInt(item.deliveryPay);
     });
     return {
       orderSums,
@@ -548,6 +552,11 @@ function Delivery() {
       }
       return temp;
     });
+  }, []);
+
+  const handleCashChange = useCallback((value) => {
+    const finalResult = isNaN(parseInt(value)) ? 0 : parseInt(value);
+    setCashFromDeliver(finalResult);
   }, []);
 
   return (
@@ -962,7 +971,8 @@ function Delivery() {
                   )
                     ? 0
                     : payoffDeliveriesSum?.paymentSums -
-                      payoffDeliveriesSum?.deliveryCosts}{" "}
+                      payoffDeliveriesSum?.deliveryCosts -
+                      parseInt(cashFromDeliver)}{" "}
                   тг
                 </td>
                 <td style={{ textAlign: "center" }}>
@@ -986,6 +996,20 @@ function Delivery() {
               </tr>
             </tfoot>
           </table>
+        </div>
+        <div>
+          <LegendInput
+            value={deliveriesListComment}
+            setValue={setDeliveriesListComment}
+            legend="Заметка"
+            disabled={processLoading}
+          />
+          <LegendInput
+            value={cashFromDeliver}
+            setValue={handleCashChange}
+            legend="Наличные от курьера"
+            disabled={processLoading}
+          />
         </div>
         <div
           className={cl.Center}

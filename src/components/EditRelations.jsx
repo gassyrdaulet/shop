@@ -528,10 +528,6 @@ function EditRelations() {
                       key={good.id}
                       onClick={() => {
                         newGood(good.id, good.name);
-                        setSelectedGroup({});
-                        setGoodsVisible(false);
-                        setSearch("");
-                        setNewGoodModal(false);
                       }}
                       className={cl.OptionsButton}
                     >

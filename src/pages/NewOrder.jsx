@@ -18,6 +18,7 @@ import useAuth from "../hooks/useAuth";
 import CheckBox from "../components/CheckBox";
 import { getManagers, getOrgInfo } from "../api/OrganizationService";
 import { newOrder } from "../api/OrderService";
+import Button from "../components/Button";
 
 function NewOrder() {
   const [newOrderLoading, setNewOrderLoading] = useState(false);
@@ -305,24 +306,26 @@ function NewOrder() {
 
   const newGood = useCallback(
     (good) => {
-      if (good.remainder <= 0) {
-        alert("Ошибка", "Товара нет в наличии.");
-        return;
-      }
-      const temp = [...goods];
-      for (let item of temp) {
-        if (item.id === good.id) {
-          if (item.quantity + 1 > good.remainder) {
-            return;
-          }
-          item.quantity = parseInt(item.quantity) + 1;
-          return;
+      setGoods((prev) => {
+        if (good.remainder <= 0) {
+          alert("Ошибка", "Товара нет в наличии.");
+          return prev;
         }
-      }
-      temp.push(good);
-      setGoods(temp);
+        const temp = [...prev];
+        for (let item of temp) {
+          if (item.id === good.id) {
+            if (item.quantity + 1 > good.remainder) {
+              return prev;
+            }
+            item.quantity = parseInt(item.quantity) + 1;
+            return temp;
+          }
+        }
+        temp.push(good);
+        return temp;
+      });
     },
-    [goods, alert]
+    [alert]
   );
 
   const newPayment = (paymentItem) => {
@@ -913,7 +916,23 @@ function NewOrder() {
                 <BiChevronLeftCircle size={25} />
                 Назад
               </div>
-              <p className={cl.NavigationGroupName}>{selectedGroup?.name}</p>
+              <Button
+                text="Выбрать все"
+                onClick={() => {
+                  for (let good of filteredGoods) {
+                    newGood({
+                      id: good.id,
+                      name: good.name,
+                      price: good.price,
+                      purchase: good.purchase,
+                      quantity: 1,
+                      discount: { amount: 0, type: "KZT" },
+                      remainder: good.remainder,
+                    });
+                  }
+                }}
+                className={cl.NavigationGroupName}
+              />
               <SearchInput
                 placeholder="Поиск"
                 value={search}
@@ -938,10 +957,6 @@ function NewOrder() {
                           discount: { amount: 0, type: "KZT" },
                           remainder: good.remainder,
                         });
-                        setSelectedGroup({});
-                        setGoodsVisible(false);
-                        setSearch("");
-                        setAddGoodModal(false);
                       }}
                       className={cl.OptionsButton}
                     >

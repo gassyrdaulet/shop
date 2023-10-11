@@ -25,6 +25,7 @@ function Goods() {
   const [searchInput, setSearchInput] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
   const [file, setFile] = useState();
+  const [sort, setSort] = useState({ key: "none" });
   const [groups, setGroups] = useState([]);
   const [selectedSort, setSelectedSort] = useState(-2);
   const fetch = () => {
@@ -103,9 +104,42 @@ function Goods() {
     }
   }, [sortedGoods, selectedSort]);
 
+  const sortedGoodsByKeys = useMemo(() => {
+    try {
+      const none = "none";
+      const numeric = "numeric";
+      const text = "text";
+      if (sort.key === none) {
+        return sortFilteredGoods;
+      }
+      if (sort.type === text) {
+        const temp = [...sortFilteredGoods].sort((a, b) => {
+          return (
+            (sort.inverse ? -1 : 1) *
+            (a[sort.key] + "").localeCompare(b[sort.key] + "")
+          );
+        });
+        return temp;
+      }
+      if (sort.type === numeric) {
+        const temp = [...sortFilteredGoods].sort((a, b) => {
+          const result =
+            (sort.inverse ? 1 : -1) *
+            (parseInt(a[sort.key]) > parseInt(b[sort.key]) ? -1 : 1);
+          return result;
+        });
+        return temp;
+      }
+      return [];
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }, [sortFilteredGoods, sort]);
+
   const filteredGoods = useMemo(() => {
     try {
-      const temp = [...sortFilteredGoods].filter(
+      const temp = [...sortedGoodsByKeys].filter(
         (good) =>
           good.name.toLowerCase().includes(searchInput.toLowerCase()) ||
           good?.barcode?.toLowerCase()?.includes(searchInput.toLowerCase()) ||
@@ -116,7 +150,7 @@ function Goods() {
       console.log(e);
       return [];
     }
-  }, [sortFilteredGoods, searchInput]);
+  }, [sortedGoodsByKeys, searchInput]);
 
   const totalInfo = useMemo(() => {
     let purchaseSum = 0;
@@ -235,7 +269,7 @@ function Goods() {
             ) : (
               <table>
                 <thead>
-                  <GoodsHeaders />
+                  <GoodsHeaders sort={sort} setSort={setSort} />
                 </thead>
                 {filteredGoods.length === 0 ? (
                   <tbody style={{ width: "100%", textAlign: "center" }}>

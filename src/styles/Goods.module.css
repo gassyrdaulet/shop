@@ -126,6 +126,9 @@
   flex-direction: row;
   justify-content: space-between;
 }
+.Options > * {
+  min-width: 120px;
+}
 .OptionsButtons {
   display: flex;
   flex-direction: row;

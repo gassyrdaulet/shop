@@ -13,6 +13,7 @@ import { getGoodsAndGroups } from "../api/GoodService";
 import SearchInput from "../components/SearchInput";
 import { newAcceptance, newWriteOff } from "../api/WarehouseService";
 import useAuth from "../hooks/useAuth";
+import Button from "../components/Button";
 
 function NewAcceptance() {
   const [newAcceptLoading, setNewAcceptLoading] = useState(false);
@@ -33,28 +34,31 @@ function NewAcceptance() {
 
   const newGood = useCallback(
     (good) => {
-      if (type === "wo") {
-        if (good.remainder <= 0) {
-          alert("Ошибка", "Товара нет в наличии.");
-          return;
-        }
-      }
-      const temp = [...goods];
-      for (let item of temp) {
-        if (item.id === good.id) {
-          if (item.quantity + 1 > good.remainder) {
-            if (type === "wo") {
-              return;
-            }
+      setGoods((prev) => {
+        console.log(prev);
+        if (type === "wo") {
+          if (good.remainder <= 0) {
+            alert("Ошибка", "Товара нет в наличии.");
+            return prev;
           }
-          item.quantity = parseInt(item.quantity) + 1;
-          return;
         }
-      }
-      temp.push(good);
-      setGoods(temp);
+        const temp = [...prev];
+        for (let item of temp) {
+          if (item.id === good.id) {
+            if (item.quantity + 1 > good.remainder) {
+              if (type === "wo") {
+                return prev;
+              }
+            }
+            item.quantity = parseInt(item.quantity) + 1;
+            return temp;
+          }
+        }
+        temp.push(good);
+        return temp;
+      });
     },
-    [goods, alert, type]
+    [alert, type]
   );
 
   useEffect(() => {
@@ -346,10 +350,29 @@ function NewAcceptance() {
                       <BiChevronLeftCircle size={25} />
                       Назад
                     </div>
-                    <p className={cl.NavigationGroupName}>
-                      {selectedGroup.name}
-                    </p>
+
+                    <Button
+                      text="Выбрать все"
+                      onClick={() => {
+                        for (let good of filteredGoods) {
+                          newGood({
+                            id: good.id,
+                            name: good.name,
+                            price:
+                              type === "ac"
+                                ? good.inventories?.length > 0
+                                  ? good.inventories[0].price
+                                  : good.purchase
+                                : good.price,
+                            quantity: 1,
+                            remainder: good.remainder,
+                          });
+                        }
+                      }}
+                      className={cl.NavigationGroupName}
+                    />
                     <SearchInput
+                      autoFocus={true}
                       placeholder="Поиск"
                       value={search}
                       setValue={setSearch}
@@ -373,13 +396,9 @@ function NewAcceptance() {
                                       ? good.inventories[0].price
                                       : good.purchase
                                     : good.price,
-                                quantity: 0,
+                                quantity: 1,
                                 remainder: good.remainder,
                               });
-                              setSelectedGroup({});
-                              setGoodsVisible(false);
-                              setSearch("");
-                              setAddGoodModal(false);
                             }}
                             className={cl.OptionsButton}
                           >

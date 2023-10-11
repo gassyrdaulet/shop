@@ -103,6 +103,39 @@ export const getFinishedOrders = async ({
     });
 };
 
+export const getDeliveryLists = async ({
+  setProcessLoading,
+  setData,
+  firstDate,
+  secondDate,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/orders/getdeliverylists`,
+      {
+        firstDate,
+        secondDate,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      setData(data);
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
 export const newOrder = async ({ order, setNewOrderLoading, next }) => {
   setNewOrderLoading(true);
   // const token = await cookies.get(TOKEN_NAME);
@@ -175,7 +208,7 @@ export const issueCash = async ({
         },
       }
     );
-    await axios.post(
+    const { data } = await axios.post(
       `${SERVER_URL}/api/orders/issuepickup`,
       { orderId: id, payment },
       {
@@ -184,7 +217,8 @@ export const issueCash = async ({
         },
       }
     );
-    next();
+    const { receiptId, receiptDate } = data;
+    next(receiptId, receiptDate);
   } catch (err) {
     alert("Ошибка!", errParser(err));
     setProcessLoading(false);
@@ -205,9 +239,10 @@ export const cashOrder = async ({ order, setProcessLoading, next }) => {
         },
       }
     )
-    .then(() => {
+    .then(({ data }) => {
       alert("Успешно", `Вы успешно создали новый заказ.`);
-      next();
+      const { receiptId, receiptDate } = data;
+      next(receiptId, receiptDate);
     })
     .catch((err) => {
       alert("Ошибка", errParser(err));
@@ -256,6 +291,37 @@ export const editOrderManager = async ({
     .post(
       `${SERVER_URL}/api/orders/editmanager`,
       { managerId: newManager, orderId },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(() => {
+      alert("Успешно", `Вы успешно отредактировали заказ.`);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const editOrderDeliver = async ({
+  newDeliver,
+  setProcessLoading,
+  orderId,
+  next,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/orders/editdeliver`,
+      { deliverId: newDeliver, orderId },
       {
         headers: {
           [TOKEN_NAME]: token,
@@ -363,6 +429,8 @@ export const finishOrder = async ({
   deliver,
   next,
   deliveryList,
+  comment,
+  cash,
 }) => {
   setProcessLoading(true);
   // const token = await cookies.get(TOKEN_NAME);
@@ -370,7 +438,7 @@ export const finishOrder = async ({
   axios
     .post(
       `${SERVER_URL}/api/orders/finishorder`,
-      { orderIds: ids, deliver, deliveryList },
+      { orderIds: ids, deliver, deliveryList, comment, cash },
       {
         headers: {
           [TOKEN_NAME]: token,

@@ -3,12 +3,15 @@ import MyButton from "../components/MyButton";
 import useAuth from "../hooks/useAuth";
 import TextButton from "../components/TextButton";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ping, checkOrg } from "../api/AuthService";
+import Modal from "../components/Modal";
+import LegendInput from "../components/LegendInput";
+import Button from "../components/MyButton";
+import { newOrganization } from "../api/OrganizationService";
 
 function NoOrg() {
   const {
-    alert,
     setIsAuth,
     setIsAuthLoading,
     setIsNoOrg,
@@ -16,6 +19,9 @@ function NoOrg() {
     setIsError,
   } = useAuth();
   const navigate = useNavigate();
+  const [createOrgModal, setCreateOrgModal] = useState(false);
+  const [orgName, setOrgName] = useState("");
+  const [processLoading, setProcessLoading] = useState("");
 
   useEffect(() => {
     checkOrg({ setIsNoOrg, setIsCheckOrgLoading });
@@ -51,9 +57,9 @@ function NoOrg() {
           <center style={{ margin: 20 }}>
             <MyButton
               text="Создать новую организацию"
-              onClick={() =>
-                alert("Недоступно", "Пока что недоступно, извините.")
-              }
+              onClick={() => {
+                setCreateOrgModal(true);
+              }}
             />
           </center>
           <p>
@@ -71,6 +77,48 @@ function NoOrg() {
           </center>
         </div>
       </div>
+      <Modal
+        modalVisible={createOrgModal}
+        setModalVisible={setCreateOrgModal}
+        noEscape={processLoading}
+      >
+        <p
+          style={{
+            marginBottom: 15,
+          }}
+        >
+          Создание организации
+        </p>
+        <LegendInput
+          value={orgName}
+          setValue={setOrgName}
+          type="text"
+          legend="Название организации"
+          inputMode="text"
+          disabled={processLoading}
+        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 15,
+          }}
+        >
+          <Button
+            disabled={processLoading}
+            text="Создать организацию"
+            onClick={() => {
+              newOrganization({
+                setIsLoading: setProcessLoading,
+                name: orgName,
+                next: () => {
+                  navigate(0);
+                },
+              });
+            }}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }
