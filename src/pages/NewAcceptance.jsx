@@ -12,7 +12,6 @@ import Modal from "../components/Modal";
 import { getGoodsAndGroups } from "../api/GoodService";
 import SearchInput from "../components/SearchInput";
 import { newAcceptance, newWriteOff } from "../api/WarehouseService";
-import useAuth from "../hooks/useAuth";
 import Button from "../components/Button";
 
 function NewAcceptance() {
@@ -30,15 +29,12 @@ function NewAcceptance() {
   const [goodsVisible, setGoodsVisible] = useState(false);
   const navigate = useNavigate();
   const { type } = useParams();
-  const { alert } = useAuth();
 
   const newGood = useCallback(
     (good) => {
       setGoods((prev) => {
-        console.log(prev);
         if (type === "wo") {
           if (good.remainder <= 0) {
-            alert("Ошибка", "Товара нет в наличии.");
             return prev;
           }
         }
@@ -58,7 +54,7 @@ function NewAcceptance() {
         return temp;
       });
     },
-    [alert, type]
+    [type]
   );
 
   useEffect(() => {

@@ -22,6 +22,9 @@ import Cash from "../pages/Cash";
 import Registration from "../pages/Registration";
 import Labels from "../pages/Labels";
 import DeliveryLists from "../pages/DeliveryLists";
+import ABC from "../pages/ABC";
+import Cashboxes from "../pages/Cashboxes";
+import Spendings from "../pages/Spendings";
 
 export const userRoutes = [
   { path: "/goods/remainders", element: <Goods></Goods> },
@@ -42,6 +45,9 @@ export const userRoutes = [
     element: <InventoryDetails></InventoryDetails>,
   },
   { path: "/summaries/usersummary", element: <UserSummary></UserSummary> },
+  { path: "/summaries/abc", element: <ABC></ABC> },
+  { path: "/summaries/cashboxes", element: <Cashboxes></Cashboxes> },
+  { path: "/summaries/spendings", element: <Spendings></Spendings> },
   {
     path: "/summaries/deliverylists",
     element: <DeliveryLists></DeliveryLists>,

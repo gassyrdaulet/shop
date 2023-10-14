@@ -14,7 +14,6 @@ import Modal from "../components/Modal";
 import { getGoodsAndGroups } from "../api/GoodService";
 import NoPaymentHeaders from "../components/NoPaymentHeaders";
 import NoPaymentRow from "../components/NoPaymentRow";
-import useAuth from "../hooks/useAuth";
 import CheckBox from "../components/CheckBox";
 import { getManagers, getOrgInfo } from "../api/OrganizationService";
 import { newOrder } from "../api/OrderService";
@@ -45,7 +44,6 @@ function NewOrder() {
   const [managersLoading, setManagersLoading] = useState(false);
   const [date, setDate] = useState(moment().format("yyyy-MM-DD"));
   const navigate = useNavigate();
-  const { alert } = useAuth();
   const [deliveryInputs, setDeliveryInputs] = useState([
     {
       title: "Номер телефона",
@@ -304,29 +302,25 @@ function NewOrder() {
     },
   ];
 
-  const newGood = useCallback(
-    (good) => {
-      setGoods((prev) => {
-        if (good.remainder <= 0) {
-          alert("Ошибка", "Товара нет в наличии.");
-          return prev;
-        }
-        const temp = [...prev];
-        for (let item of temp) {
-          if (item.id === good.id) {
-            if (item.quantity + 1 > good.remainder) {
-              return prev;
-            }
-            item.quantity = parseInt(item.quantity) + 1;
-            return temp;
+  const newGood = useCallback((good) => {
+    setGoods((prev) => {
+      if (good.remainder <= 0) {
+        return prev;
+      }
+      const temp = [...prev];
+      for (let item of temp) {
+        if (item.id === good.id) {
+          if (item.quantity + 1 > good.remainder) {
+            return prev;
           }
+          item.quantity = parseInt(item.quantity) + 1;
+          return temp;
         }
-        temp.push(good);
-        return temp;
-      });
-    },
-    [alert]
-  );
+      }
+      temp.push(good);
+      return temp;
+    });
+  }, []);
 
   const newPayment = (paymentItem) => {
     const temp = [...payment];

@@ -357,7 +357,13 @@ function Goods() {
             isLoading={importLoading}
             disabled={!file}
             onClick={async () => {
-              uploadXLSX({ file, setImportLoading, next: () => {} });
+              uploadXLSX({
+                file,
+                setImportLoading,
+                next: (data) => {
+                  console.log(data);
+                },
+              });
             }}
           />
         </div>

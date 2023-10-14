@@ -1,6 +1,6 @@
 import React from "react";
 
-function DeliveryHeaders({ type }) {
+function DeliveryHeaders() {
   return (
     <tr>
       <th>№</th>

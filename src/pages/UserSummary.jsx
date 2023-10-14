@@ -10,6 +10,7 @@ import {
 } from "../api/OrganizationService";
 import { getFinishedOrders } from "../api/OrderService";
 import Loading from "../components/Loading";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 
 function UserSummary() {
   const [fecthLoading, setFetchLoading] = useState(false);
@@ -321,6 +322,19 @@ function UserSummary() {
     });
   }, [firstDate, secondDate, dateTypes, dateType]);
 
+  const chartData = useMemo(() => {
+    const temp = totalsByDays
+      .map((item) => {
+        return {
+          date: moment(item.date).format("DD.MM.yyyy"),
+          profit: item.profit,
+          sum: item.sum,
+        };
+      })
+      .reverse();
+    return temp;
+  }, [totalsByDays]);
+
   return (
     <div className="pageWrapper">
       <div className={cl.Options}>
@@ -403,7 +417,11 @@ function UserSummary() {
           />
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div></div>
-            <Button onClick={handleUpdate} text="Применить" />
+            <Button
+              disabled={fecthLoading}
+              onClick={handleUpdate}
+              text="Применить"
+            />
           </div>
         </div>
         <div className={cl.secondHalf}>
@@ -538,6 +556,22 @@ function UserSummary() {
                 })}
               </tbody>
             </table>
+          </div>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              margin: "10px 0",
+            }}
+          >
+            <LineChart width={600} height={300} data={chartData}>
+              <Line type="monotone" dataKey="profit" stroke="#24cd24" />
+              <Line type="monotone" dataKey="sum" stroke="#cd2424" />
+              <CartesianGrid stroke="#ccc" />
+              <XAxis dataKey="date" />
+              <YAxis />
+            </LineChart>
           </div>
           <div
             className={cl.tableWrapper}

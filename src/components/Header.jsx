@@ -13,6 +13,7 @@ import {
   BsPencil,
   BsTag,
   BsCarFront,
+  BsGraphUp,
 } from "react-icons/bs";
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import useAuth from "../hooks/useAuth";
@@ -22,7 +23,7 @@ import HeaderIcon from "./HeaderIcon";
 import Modal from "./Modal";
 import MyButton from "./MyButton";
 import { useNavigate, useLocation } from "react-router-dom";
-import { BiListCheck, BiUser } from "react-icons/bi";
+import { BiListCheck, BiMoney, BiUser } from "react-icons/bi";
 
 function Header() {
   const { setIsAuth } = useAuth();
@@ -108,6 +109,24 @@ function Header() {
           name: "Ист. расчетов",
           onClick: () => navigate("/summaries/deliverylists"),
           path: "/summaries/deliverylists",
+        },
+        {
+          icon: <BsCashCoin />,
+          name: "Ист. касс",
+          onClick: () => navigate("/summaries/cashboxes"),
+          path: "/summaries/cashboxes",
+        },
+        {
+          icon: <BiMoney />,
+          name: "Расходы",
+          onClick: () => navigate("/summaries/spendings"),
+          path: "/summaries/spendings",
+        },
+        {
+          icon: <BsGraphUp />,
+          name: "ABC анализ",
+          onClick: () => navigate("/summaries/abc"),
+          path: "/summaries/abc",
         },
       ],
     },

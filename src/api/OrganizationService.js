@@ -109,14 +109,19 @@ export const closeCashbox = async ({ setProcessLoading, cashboxId, next }) => {
     });
 };
 
-export const addCashToCashbox = async ({ setProcessLoading, amount, next }) => {
+export const addCashToCashbox = async ({
+  setProcessLoading,
+  amount,
+  next,
+  comment,
+}) => {
   setProcessLoading(true);
   // const token = await cookies.get(TOKEN_NAME);
   const token = localStorage.getItem(TOKEN_NAME);
   axios
     .post(
       `${SERVER_URL}/api/organization/addcashtocashbox`,
-      { amount },
+      { amount, comment },
       {
         headers: {
           [TOKEN_NAME]: token,
@@ -139,6 +144,7 @@ export const removeCashFromCashbox = async ({
   setProcessLoading,
   amount,
   next,
+  comment,
 }) => {
   setProcessLoading(true);
   // const token = await cookies.get(TOKEN_NAME);
@@ -146,7 +152,7 @@ export const removeCashFromCashbox = async ({
   axios
     .post(
       `${SERVER_URL}/api/organization/removecashfromcashbox`,
-      { amount },
+      { amount, comment },
       {
         headers: {
           [TOKEN_NAME]: token,
@@ -346,6 +352,111 @@ export const getUsers = async ({ setUsers, setFetchLoading }) => {
     })
     .finally(() => {
       setFetchLoading(false);
+    });
+};
+
+export const getSpendings = async ({
+  setProcessLoading,
+  setData,
+  firstDate,
+  secondDate,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/getspendings`,
+      {
+        firstDate,
+        secondDate,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      setData(data);
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const newSpending = async ({
+  setProcessLoading,
+  purpose,
+  sum,
+  comment,
+  date,
+  next,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/newspending`,
+      {
+        purpose,
+        sum,
+        comment,
+        date,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(() => {
+      next();
+      alert("Успешно", `Вы успешно создали новый заказ.`);
+    })
+    .catch((err) => {
+      console.log(err);
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
+export const getCashboxes = async ({
+  setProcessLoading,
+  setData,
+  firstDate,
+  secondDate,
+}) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/getcashboxes`,
+      {
+        firstDate,
+        secondDate,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      setData(data);
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
     });
 };
 

@@ -59,7 +59,7 @@ function EditAccount() {
     setInputs((prev) => {
       const temp = [...prev];
       temp.forEach((item) => {
-        item.value = userData[item.name];
+        item.value = userData?.[item.name] ? userData[item.name] : "";
       });
       return temp;
     });
