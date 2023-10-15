@@ -158,6 +158,8 @@ function Delivery() {
   );
 
   useEffect(() => {
+    setFirstDate(moment().startOf("day").format("yyyy-MM-DD"));
+    setSecondDate(moment().startOf("day").add(1, "days").format("yyyy-MM-DD"));
     getDelivers({ setDelivers, setDeliversLoading });
     getManagers({ setManagers, setManagersLoading });
     getFinishedOrdersCallback();
@@ -348,7 +350,7 @@ function Delivery() {
         const temp = [...filteredOrders].sort((a, b) => {
           let result = 0;
           if (moment(a.creationdate) < moment(b.creationdate)) {
-            result = sort === 2 ? -1 : 1;
+            result = sort === 1 ? 1 : -1;
           }
           if (moment(a.creationdate) > moment(b.creationdate)) {
             result = sort === 2 ? 1 : -1;

@@ -103,6 +103,45 @@ export const getFinishedOrders = async ({
     });
 };
 
+export const getFinishedOrdersForSummary = async ({
+  setFinishedOrdersLoading,
+  setFinishedOrders,
+  firstDate,
+  secondDate,
+  dateType,
+  delivery = true,
+  next = () => {},
+}) => {
+  setFinishedOrdersLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/orders/getfinishedforsum`,
+      {
+        firstDate,
+        secondDate,
+        dateType,
+        delivery,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(({ data }) => {
+      setFinishedOrders(data);
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setFinishedOrdersLoading(false);
+    });
+};
+
 export const getDeliveryLists = async ({
   setProcessLoading,
   setData,

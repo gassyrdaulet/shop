@@ -994,7 +994,10 @@ function OrderDetails() {
                     caption="Статус доставки"
                     value={deliveryStatuses[data.deliverystatus]}
                   />
-                  <InfoRow caption="Курьер" value={data.deliver} />
+                  <InfoRow
+                    caption="Курьер"
+                    value={data.deliver ? data.deliver : "-"}
+                  />
                   <InfoRow caption="Адрес" value={data.deliveryinfo.address} />
                   <InfoRow
                     caption="Номер телефона"
@@ -1023,10 +1026,19 @@ function OrderDetails() {
               />
               <InfoRow caption="Сумма заказа без скидки" value={sum + " тг"} />
               <InfoRow caption="Скидка" value={discount} />
-              <InfoRow caption="Кассир" value={data.cashier} />
+              <InfoRow
+                caption="Кассир"
+                value={data.cashier ? data.cashier : "-"}
+              />
               <InfoRow
                 caption="Комментарий"
-                value={data.comment === "" ? " - " : data.comment}
+                value={
+                  data.comment
+                    ? data.comment === ""
+                      ? " - "
+                      : data.comment
+                    : " - "
+                }
               />
               <InfoRow
                 caption="Заказ из Магазина Kaspi.kz"

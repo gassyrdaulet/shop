@@ -216,23 +216,6 @@ function Spendings() {
     return temp;
   }, [inputs, purposesIds]);
 
-  const spendingTotals = useMemo(() => {
-    try {
-      const temp = {};
-      data.forEach((spending) => {
-        temp[spending.purpose] = temp?.[spending.purpose]
-          ? temp[spending.purpose]
-          : 0 + spending.sum;
-      });
-      const result = Object.keys(temp).map((item) => {
-        return { purpose: purposesRussian[item], sum: temp[item] };
-      });
-      return result;
-    } catch (e) {
-      return [];
-    }
-  }, [data, purposesRussian]);
-
   const total = useMemo(() => {
     try {
       let temp = 0;
@@ -244,6 +227,28 @@ function Spendings() {
       return 0;
     }
   }, [data]);
+
+  const spendingTotals = useMemo(() => {
+    try {
+      const temp = {};
+      data.forEach((spending) => {
+        temp[spending.purpose] = temp?.[spending.purpose]
+          ? temp[spending.purpose]
+          : 0 + spending.sum;
+      });
+      const result = Object.keys(temp).map((item) => {
+        return {
+          purpose: purposesRussian[item],
+          sum: temp[item],
+          percent: (100 * temp[item]) / total,
+        };
+      });
+      result.sort((a, b) => b.sum - a.sum);
+      return result;
+    } catch (e) {
+      return [];
+    }
+  }, [total, data, purposesRussian]);
 
   return (
     <div className="pageWrapper">
@@ -377,6 +382,7 @@ function Spendings() {
                   <tr>
                     <th>Назначение</th>
                     <th>Сумма</th>
+                    <th>Процент</th>
                   </tr>
                 </thead>
                 {spendingTotals.length === 0 ? (
@@ -403,6 +409,13 @@ function Spendings() {
                             }}
                           >
                             {total.sum.toFixed(2)} ₸
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.percent.toFixed(0)} %
                           </td>
                         </tr>
                       );
@@ -450,6 +463,7 @@ function Spendings() {
                           spending={spending}
                           index={index + 1}
                           purpose={purposesRussian[spending.purpose]}
+                          update={() => navigate(0)}
                         />
                       );
                     })}

@@ -8,7 +8,7 @@ function SpendingHeaders() {
       <th>Дата открытия</th>
       <th>Дата закрытия</th>
       <th>Кассир</th>
-      <th>Сумма</th>
+      <th>Наличка</th>
       <th></th>
     </tr>
   );

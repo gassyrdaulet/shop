@@ -96,8 +96,12 @@ function Order({ order, checked, handleMark, status, dateType, orderStatus }) {
         />
       </td>
       <td style={{ textAlign: "center" }}>{sumWithDiscount} тг</td>
-      <td style={{ textAlign: "center" }}>{order.author}</td>
-      <td style={{ textAlign: "center" }}>{order.deliver}</td>
+      <td style={{ textAlign: "center" }}>
+        {order.author ? order.author : "-"}
+      </td>
+      <td style={{ textAlign: "center" }}>
+        {order.deliver ? order.deliver : "-"}
+      </td>
       <td style={{ minWidth: 150, wordBreak: "break-all", textAlign: "start" }}>
         {order.deliveryinfo.address}
       </td>

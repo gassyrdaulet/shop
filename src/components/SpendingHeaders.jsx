@@ -10,6 +10,7 @@ function SpendingHeaders() {
       <th>Дата</th>
       <th>Заметка</th>
       <th>Пользователь</th>
+      <th></th>
     </tr>
   );
 }

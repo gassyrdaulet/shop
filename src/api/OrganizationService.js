@@ -427,6 +427,33 @@ export const newSpending = async ({
     });
 };
 
+export const deleteSpending = async ({ setProcessLoading, id, next }) => {
+  setProcessLoading(true);
+  // const token = await cookies.get(TOKEN_NAME);
+  const token = localStorage.getItem(TOKEN_NAME);
+  axios
+    .post(
+      `${SERVER_URL}/api/organization/deletespending`,
+      {
+        id,
+      },
+      {
+        headers: {
+          [TOKEN_NAME]: token,
+        },
+      }
+    )
+    .then(() => {
+      next();
+    })
+    .catch((err) => {
+      alert("Ошибка", errParser(err));
+    })
+    .finally(() => {
+      setProcessLoading(false);
+    });
+};
+
 export const getCashboxes = async ({
   setProcessLoading,
   setData,

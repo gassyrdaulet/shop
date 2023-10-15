@@ -8,9 +8,93 @@ import {
   getManagersForSummary as getManagers,
   getOrgInfo,
 } from "../api/OrganizationService";
-import { getFinishedOrders } from "../api/OrderService";
+import { getFinishedOrdersForSummary as getFinishedOrders } from "../api/OrderService";
 import Loading from "../components/Loading";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  Tooltip,
+  PieChart,
+  Pie,
+  Sector,
+} from "recharts";
+
+const renderActiveShape = (props) => {
+  const RADIAN = Math.PI / 180;
+  const {
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    startAngle,
+    endAngle,
+    fill,
+    payload,
+    percent,
+    value,
+  } = props;
+  const sin = Math.sin(-RADIAN * midAngle);
+  const cos = Math.cos(-RADIAN * midAngle);
+  const sx = cx + (outerRadius + 10) * cos;
+  const sy = cy + (outerRadius + 10) * sin;
+  const mx = cx + (outerRadius + 30) * cos;
+  const my = cy + (outerRadius + 30) * sin;
+  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+  const ey = my;
+  const textAnchor = cos >= 0 ? "start" : "end";
+
+  return (
+    <g>
+      <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
+        {payload.name}
+      </text>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+      />
+      <Sector
+        cx={cx}
+        cy={cy}
+        startAngle={startAngle}
+        endAngle={endAngle}
+        innerRadius={outerRadius + 6}
+        outerRadius={outerRadius + 10}
+        fill={fill}
+      />
+      <path
+        d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+        stroke={fill}
+        fill="none"
+      />
+      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+      <text
+        x={ex + (cos >= 0 ? 1 : -1) * 12}
+        y={ey}
+        textAnchor={textAnchor}
+        fill="#333"
+      >{`${value} тг`}</text>
+      <text
+        x={ex + (cos >= 0 ? 1 : -1) * 12}
+        y={ey}
+        dy={18}
+        textAnchor={textAnchor}
+        fill="#999"
+      >
+        {`(${(percent * 100).toFixed(2)}%)`}
+      </text>
+    </g>
+  );
+};
 
 function UserSummary() {
   const [fecthLoading, setFetchLoading] = useState(false);
@@ -31,6 +115,7 @@ function UserSummary() {
   const [managersLoading, setManagersLoading] = useState(true);
   const [orders, setOrders] = useState([]);
   const [dateType, setDateType] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const buttons = [];
   const buttons2 = [];
 
@@ -44,6 +129,11 @@ function UserSummary() {
         }
       },
     });
+    const fdate = moment().startOf("day").format("yyyy-MM-DD");
+    const sdate = moment().startOf("day").add(1, "days").format("yyyy-MM-DD");
+    setFirstDate(fdate);
+    setSecondDate(sdate);
+    setSelectedDates({ firstDate: fdate, secondDate: sdate });
     getFinishedOrders({
       setFinishedOrdersLoading: setFetchLoading,
       setFinishedOrders: setOrders,
@@ -112,15 +202,13 @@ function UserSummary() {
   const filteredOrdersByCountable = useMemo(() => {
     try {
       const temp = orders.filter((order) => {
-        const wasReturned = order.wasReturned ? order.wasReturned : false;
         const kaspiInfo = order?.kaspiinfo;
         const kaspiInfoObject = kaspiInfo ? Object.keys(kaspiInfo) : [];
         const isKaspi = kaspiInfoObject ? kaspiInfoObject.length > 0 : false;
         return (
-          order.status === "finished" &&
+          (order.status === "finished" || order.status === "returned") &&
           order.countable === 1 &&
-          !isKaspi &&
-          !wasReturned
+          !isKaspi
         );
       });
       return temp;
@@ -167,10 +255,15 @@ function UserSummary() {
   }, [filteredOrdersByPickup, manager]);
 
   const totals = useMemo(() => {
+    const dateDifference = moment(selectedDates.secondDate).diff(
+      moment(selectedDates.firstDate),
+      "days"
+    );
     const orders = filteredOrdersByManager;
     let totalSum = 0;
     let totalPurchaseSum = 0;
     let paymentComission = 0;
+    let returnedOrders = 0;
     orders.forEach((order) => {
       let orderSum = 0;
       let purchaseSum = 0;
@@ -178,6 +271,10 @@ function UserSummary() {
       let orderDiscountSum = 0;
       let sum = 0;
       let orderPaymentComission = 0;
+      const { status, wasReturned } = order;
+      if (status === "returned" && wasReturned === 0) {
+        returnedOrders++;
+      }
       order.payment.forEach((payment) => {
         orderPaymentComission +=
           (payment.sum * paymentMethods[payment.method]) / 100;
@@ -191,25 +288,53 @@ function UserSummary() {
         orderSum += parseInt(good.price) * parseInt(good.quantity);
         purchaseSum += parseInt(good.purchase) * parseInt(good.quantity);
       });
-      paymentComission += orderPaymentComission;
       sum = orderSum - discountSum;
       orderDiscountSum =
         order.discount.type === "KZT"
           ? parseInt(order.discount.amount)
           : (sum * order.discount.amount) / 100;
-      totalSum += sum - orderDiscountSum;
-      totalPurchaseSum += purchaseSum;
+      totalSum =
+        totalSum +
+        (status === "returned" && wasReturned === 0 ? -1 : 1) *
+          (sum - orderDiscountSum);
+      totalPurchaseSum =
+        totalPurchaseSum +
+        (status === "returned" && wasReturned === 0 ? -1 : 1) * purchaseSum;
+      paymentComission =
+        paymentComission + status === "returned" && wasReturned === 0
+          ? 0
+          : orderPaymentComission;
     });
     return [
-      { text: "Реализовано:", sum: totalSum.toFixed(2) + "  ₸" },
+      {
+        text: "Реализовано:",
+        sum: totalSum.toFixed(2) + "  ₸",
+        average: (totalSum / dateDifference).toFixed(2) + "  ₸",
+      },
       {
         text: "Прибыль:",
         sum:
           (totalSum - totalPurchaseSum - paymentComission).toFixed(2) + "  ₸",
+        average:
+          (
+            (totalSum - totalPurchaseSum - paymentComission) /
+            dateDifference
+          ).toFixed(2) + "  ₸",
       },
-      { text: "Всего продаж:", sum: orders.length + " шт." },
+      {
+        text: "Всего продаж:",
+        sum: orders.length - returnedOrders + " шт.",
+        average:
+          ((orders.length - returnedOrders) / dateDifference).toFixed(2) +
+          " шт.",
+      },
+      {
+        text: "Возвраты:",
+        sum: returnedOrders + " шт.",
+        average: (returnedOrders / dateDifference).toFixed(2) + " шт.",
+      },
     ];
-  }, [filteredOrdersByManager, paymentMethods]);
+  }, [filteredOrdersByManager, paymentMethods, selectedDates]);
 
   const totalsByDays = useMemo(() => {
     const dateDifference = moment(selectedDates.secondDate).diff(
@@ -239,7 +364,12 @@ function UserSummary() {
       let totalSum = 0;
       let totalPurchaseSum = 0;
       let paymentComission = 0;
+      let returnedOrders = 0;
       day.orders.forEach((order) => {
+        const { status, wasReturned } = order;
+        if (status === "returned" && wasReturned === 0) {
+          returnedOrders++;
+        }
         let orderSum = 0;
         let purchaseSum = 0;
         let discountSum = 0;
@@ -264,12 +394,22 @@ function UserSummary() {
           order.discount.type === "KZT"
             ? parseInt(order.discount.amount)
             : (sum * order.discount.amount) / 100;
-        totalSum += sum - orderDiscountSum;
-        totalPurchaseSum += purchaseSum;
-        paymentComission += orderPaymentComission;
+        totalSum =
+          totalSum +
+          (status === "returned" && wasReturned === 0 ? -1 : 1) *
+            (sum - orderDiscountSum);
+        totalPurchaseSum =
+          totalPurchaseSum +
+          (status === "returned" && wasReturned === 0 ? -1 : 1) * purchaseSum;
+        paymentComission =
+          paymentComission + status === "returned" && wasReturned === 0
+            ? 0
+            : orderPaymentComission;
       });
-      day.sum = totalSum.toFixed(2);
-      day.profit = (totalSum - totalPurchaseSum - paymentComission).toFixed(2);
+      day.sum = totalSum;
+      day.profit = totalSum - totalPurchaseSum - paymentComission;
+      day.sales = day.orders.length - returnedOrders;
+      day.returnedOrders = returnedOrders;
     });
     return temp;
   }, [
@@ -301,8 +441,10 @@ function UserSummary() {
           name: paymentMethodNames[key],
           sum,
           comission: ((sum * paymentMethods[key]) / 100).toFixed(2),
+          value: temp[key],
         });
       });
+      final.sort((a, b) => b.value - a.value);
       return final;
     } catch (e) {
       console.log("Payment Totals Error:", e);
@@ -311,7 +453,6 @@ function UserSummary() {
   }, [filteredOrdersByManager, paymentMethodNames, paymentMethods]);
 
   const handleUpdate = useCallback(() => {
-    setSelectedDates({ firstDate, secondDate });
     getFinishedOrders({
       setFinishedOrdersLoading: setFetchLoading,
       setFinishedOrders: setOrders,
@@ -319,16 +460,21 @@ function UserSummary() {
       secondDate,
       dateType: dateTypes[dateType],
       delivery: null,
+      next: () => {
+        setSelectedDates({ firstDate, secondDate });
+      },
     });
   }, [firstDate, secondDate, dateTypes, dateType]);
 
   const chartData = useMemo(() => {
     const temp = totalsByDays
       .map((item) => {
+        const average = Math.floor(item.sum / item.sales);
         return {
           date: moment(item.date).format("DD.MM.yyyy"),
           profit: item.profit,
           sum: item.sum,
+          average: isNaN(average) ? 0 : average,
         };
       })
       .reverse();
@@ -514,6 +660,7 @@ function UserSummary() {
                       {total.text}
                     </p>
                     <p style={{ fontSize: 20 }}>{total.sum}</p>
+                    <p style={{ fontSize: 14 }}>{total.average}</p>
                   </div>
                 );
               })}
@@ -558,20 +705,72 @@ function UserSummary() {
             </table>
           </div>
           <div
+            className={cl.HideScroll}
             style={{
+              maxWidth: "100%",
               width: "100%",
               display: "flex",
-              justifyContent: "center",
               margin: "10px 0",
+              overflow: "auto",
             }}
           >
-            <LineChart width={600} height={300} data={chartData}>
-              <Line type="monotone" dataKey="profit" stroke="#24cd24" />
-              <Line type="monotone" dataKey="sum" stroke="#cd2424" />
-              <CartesianGrid stroke="#ccc" />
-              <XAxis dataKey="date" />
-              <YAxis />
-            </LineChart>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <LineChart
+                width={window.innerWidth < 800 ? 400 : 550}
+                height={window.innerWidth < 800 ? 200 : 275}
+                data={chartData}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis dataKey="sum" yAxisId="left" />
+                <YAxis dataKey="average" yAxisId="right" orientation="right" />
+                <Legend />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  yAxisId="left"
+                  dataKey="sum"
+                  stroke="#cd2424"
+                  name="Сумма продаж"
+                />
+                <Line
+                  type="monotone"
+                  yAxisId="left"
+                  dataKey="profit"
+                  stroke="#24cd24"
+                  name="Прибыль"
+                />
+                <Line
+                  type="monotone"
+                  yAxisId="right"
+                  dataKey="average"
+                  stroke="#2424cd"
+                  name="Средний чек"
+                />
+              </LineChart>
+              <PieChart width={500} height={500}>
+                <Pie
+                  activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
+                  data={paymentTotals}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  onMouseEnter={(_, index) => {
+                    setActiveIndex(index);
+                  }}
+                />
+              </PieChart>
+            </div>
           </div>
           <div
             className={cl.tableWrapper}
@@ -587,6 +786,7 @@ function UserSummary() {
                 <tr>
                   <th>Дата</th>
                   <th>Количество продаж</th>
+                  <th>Возвраты</th>
                   <th>На сумму</th>
                   <th>Прибыль</th>
                 </tr>
@@ -610,21 +810,28 @@ function UserSummary() {
                           textAlign: "center",
                         }}
                       >
-                        {total.orders.length} шт.
+                        {total.sales} шт.
                       </td>
                       <td
                         style={{
                           textAlign: "center",
                         }}
                       >
-                        {total.sum} ₸
+                        {total.returnedOrders} шт.
                       </td>
                       <td
                         style={{
                           textAlign: "center",
                         }}
                       >
-                        {total.profit} ₸
+                        {total.sum.toFixed(2)} ₸
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "center",
+                        }}
+                      >
+                        {total.profit.toFixed(2)} ₸
                       </td>
                     </tr>
                   );

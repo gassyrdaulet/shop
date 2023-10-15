@@ -1,6 +1,15 @@
 import moment from "moment";
+import Modal from "./Modal";
+import cl from "../styles/Goods.module.css";
+import { useState } from "react";
+import { deleteSpending } from "../api/OrganizationService";
+import MyButton from "./MyButton";
+import { BsTrash } from "react-icons/bs";
 
-function SpendingRow({ spending, index, purpose }) {
+function SpendingRow({ spending, index, purpose, update }) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   return (
     <tr>
       <td
@@ -21,6 +30,45 @@ function SpendingRow({ spending, index, purpose }) {
       <td style={{ textAlign: "center" }}>{spending.comment}</td>
       <td style={{ textAlign: "center" }}>
         {spending.username + ` (ID: ${spending.user})`}
+        <Modal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          noEscape={deleteLoading}
+        >
+          <div className={cl.ExitModalWrapper}>
+            <p className={cl.Question}>
+              Вы уверены что хотите удалить этот расход?
+            </p>
+            <div className={cl.ExitModalButtons}>
+              <MyButton
+                onClick={() => setModalVisible(false)}
+                text="Нет"
+                disabled={deleteLoading}
+              />
+              <MyButton
+                isLoading={deleteLoading}
+                onClick={() =>
+                  deleteSpending({
+                    setProcessLoading: setDeleteLoading,
+                    id: spending.id,
+                    next: update,
+                  })
+                }
+                text="Да"
+              />
+            </div>
+          </div>
+        </Modal>
+      </td>
+      <td>
+        <div
+          className={cl.MoreButtonWrapper}
+          onClick={() => setModalVisible(true)}
+        >
+          <div className={cl.MoreButton}>
+            <BsTrash />
+          </div>
+        </div>
       </td>
     </tr>
   );
