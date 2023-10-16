@@ -83,7 +83,9 @@ function Order({
         />
       </td>
       <td style={{ textAlign: "center" }}>{sumWithDiscount} тг</td>
-      <td style={{ textAlign: "center" }}>{order.author}</td>
+      <td style={{ textAlign: "center" }}>
+        {order.author ? order.author : "-"}
+      </td>
       <td style={{ textAlign: "start" }}>{order.comment}</td>
       <td style={{ textAlign: "center" }}># {order.id}</td>
       <td style={{ textAlign: "center" }}>

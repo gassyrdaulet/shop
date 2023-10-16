@@ -271,8 +271,8 @@ function UserSummary() {
       let orderDiscountSum = 0;
       let sum = 0;
       let orderPaymentComission = 0;
-      const { status, wasReturned } = order;
-      if (status === "returned" && wasReturned === 0) {
+      const { status } = order;
+      if (status === "returned") {
         returnedOrders++;
       }
       order.payment.forEach((payment) => {
@@ -294,16 +294,21 @@ function UserSummary() {
           ? parseInt(order.discount.amount)
           : (sum * order.discount.amount) / 100;
       totalSum =
-        totalSum +
-        (status === "returned" && wasReturned === 0 ? -1 : 1) *
-          (sum - orderDiscountSum);
+        totalSum + (status === "returned" ? -1 : 1) * (sum - orderDiscountSum);
+      const one = {};
+      order.payment.forEach((payment) => {
+        if (!one[payment.method]) {
+          one[payment.method] =
+            (status === "returned" ? -1 : 1) * parseInt(payment.sum);
+        } else {
+          one[payment.method] +=
+            (status === "returned" ? -1 : 1) * parseInt(payment.sum);
+        }
+      });
       totalPurchaseSum =
-        totalPurchaseSum +
-        (status === "returned" && wasReturned === 0 ? -1 : 1) * purchaseSum;
+        totalPurchaseSum + (status === "returned" ? -1 : 1) * purchaseSum;
       paymentComission =
-        paymentComission + status === "returned" && wasReturned === 0
-          ? 0
-          : orderPaymentComission;
+        paymentComission + (status === "returned") ? 0 : orderPaymentComission;
     });
     return [
       {
@@ -366,8 +371,8 @@ function UserSummary() {
       let paymentComission = 0;
       let returnedOrders = 0;
       day.orders.forEach((order) => {
-        const { status, wasReturned } = order;
-        if (status === "returned" && wasReturned === 0) {
+        const { status } = order;
+        if ((status === "returned") === 0) {
           returnedOrders++;
         }
         let orderSum = 0;
@@ -396,13 +401,11 @@ function UserSummary() {
             : (sum * order.discount.amount) / 100;
         totalSum =
           totalSum +
-          (status === "returned" && wasReturned === 0 ? -1 : 1) *
-            (sum - orderDiscountSum);
+          (status === "returned" ? -1 : 1) * (sum - orderDiscountSum);
         totalPurchaseSum =
-          totalPurchaseSum +
-          (status === "returned" && wasReturned === 0 ? -1 : 1) * purchaseSum;
+          totalPurchaseSum + (status === "returned" ? -1 : 1) * purchaseSum;
         paymentComission =
-          paymentComission + status === "returned" && wasReturned === 0
+          paymentComission + (status === "returned")
             ? 0
             : orderPaymentComission;
       });
@@ -426,11 +429,17 @@ function UserSummary() {
       const temp = {};
       const final = [];
       orders.forEach((order) => {
+        if (order.status === "cancelled") {
+          return;
+        }
+        const isReturnedOrder = order.status === "returned";
         order.payment.forEach((payment) => {
           if (!temp[payment.method]) {
-            temp[payment.method] = parseInt(payment.sum);
+            temp[payment.method] =
+              (isReturnedOrder ? -1 : 1) * parseInt(payment.sum);
           } else {
-            temp[payment.method] += parseInt(payment.sum);
+            temp[payment.method] +=
+              (isReturnedOrder ? -1 : 1) * parseInt(payment.sum);
           }
         });
       });

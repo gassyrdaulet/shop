@@ -983,7 +983,10 @@ function OrderDetails() {
                 value={sumWithDiscount + " тг"}
               />
               <InfoRow caption="Оплачено" value={paymentList} />
-              <InfoRow caption="Менеджер" value={data.author} />
+              <InfoRow
+                caption="Менеджер"
+                value={data.author ? data.author : "-"}
+              />
               <p style={{ margin: "20px 0 15px 0" }} className={cl.bigCaption}>
                 Информация о доставке
               </p>

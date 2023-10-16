@@ -1,144 +1,199 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import cl from "../styles/Goods.module.css";
-import { getDeliveryLists } from "../api/OrderService";
-import DeliveryRow from "../components/DeliveryRow";
-import DeliveryHeaders from "../components/DeliveryHeaders";
 import moment from "moment";
+import cl from "../styles/Goods.module.css";
 import SearchInput from "../components/SearchInput";
-import Button from "../components/Button";
 import Select from "../components/Select";
+import Button from "../components/Button";
+import { getFinishedOrdersForSummary as getFinishedOrders } from "../api/OrderService";
 import Loading from "../components/Loading";
-import Modal from "../components/Modal";
-import { BiCheckCircle } from "react-icons/bi";
-import { BsEyeSlashFill } from "react-icons/bs";
 
 function ABC() {
-  const [data, setData] = useState([]);
-  const [deliveryList, setDeliveryList] = useState({ deliveries: [] });
-  const [deliver, setDeliver] = useState(-1);
-  const [processLoading, setProcessLoading] = useState(false);
-  const [deliveryDetailsModal, setDeliveryDetailsModal] = useState(false);
+  const [fecthLoading, setFetchLoading] = useState(false);
   const [firstDate, setFirstDate] = useState(
-    moment().startOf("day").subtract(30, "days").format("yyyy-MM-DD")
+    moment().startOf("day").subtract(14, "days").format("yyyy-MM-DD")
   );
   const [secondDate, setSecondDate] = useState(
     moment().startOf("day").add(1, "days").format("yyyy-MM-DD")
   );
+  const [searchInput, setSearchInput] = useState("");
+  const [sortType, setSortType] = useState(1);
+  const [countable, setCountable] = useState(1);
+  const [orders, setOrders] = useState([]);
+  const [dateType, setDateType] = useState(1);
   const buttons = [];
   const buttons2 = [];
 
-  const sortedDeliveries = useMemo(() => {
-    try {
-      const temp = [...data].sort((a, b) => {
-        const result = moment(a.date) < moment(b.date) ? 1 : -1;
-        return result;
-      });
-      return temp;
-    } catch (e) {
-      console.log("Sort Data Error:", e);
-      return [];
-    }
-  }, [data]);
-
-  const delivers = useMemo(() => {
-    const temp = [];
-    for (let item of data) {
-      let found = false;
-      for (let name of temp) {
-        if (item.deliver === name) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        temp.push(item.deliver);
-      }
-    }
-    const result = temp.map((item, index) => {
-      return { id: index + 1, name: item };
-    });
-    return result;
-  }, [data]);
-
-  const filteredData = useMemo(() => {
-    try {
-      if (deliver === -1) {
-        return sortedDeliveries;
-      }
-      const temp = sortedDeliveries.filter((item) => {
-        return delivers[deliver - 1].name === item.deliver;
-      });
-      return temp;
-    } catch (e) {
-      console.log("Sort Data Error:", e);
-      return [];
-    }
-  }, [sortedDeliveries, delivers, deliver]);
-
-  const statusesRussian = useMemo(() => {
-    return {
-      processing: "На обработке",
-      awaiting: "Ожидает выдачи",
-      returned: "Возвращен",
-      cancelled: "Отменен",
-      finished: "Завершен",
-    };
-  }, []);
-
-  const payoffDeliveriesSum = useMemo(() => {
-    if (deliveryList.length === 0) {
-      return undefined;
-    }
-    let paymentSums = 0;
-    let orderSums = 0;
-    let deliveryCosts = 0;
-    let countableSum = 0;
-    let cancelledSum = 0;
-    deliveryList.deliveries.forEach((item) => {
-      if (item.status === "cancelled") {
-        cancelledSum++;
-        return;
-      }
-      paymentSums += parseInt(item.paymentSum);
-      countableSum += item.countable ? 1 : 0;
-      orderSums += parseInt(item.sum);
-      deliveryCosts += parseInt(item.deliveryPay);
-    });
-    return {
-      orderSums,
-      deliveryCosts,
-      countableSum,
-      paymentSums,
-      cancelledSum,
-    };
-  }, [deliveryList]);
-
   useEffect(() => {
-    getDeliveryLists({
-      setProcessLoading,
-      setData,
+    const fdate = moment()
+      .startOf("day")
+      .subtract(14, "days")
+      .format("yyyy-MM-DD");
+    const sdate = moment().startOf("day").add(1, "days").format("yyyy-MM-DD");
+    setFirstDate(fdate);
+    setSecondDate(sdate);
+    getFinishedOrders({
+      setFinishedOrdersLoading: setFetchLoading,
+      setFinishedOrders: setOrders,
       firstDate: moment()
         .startOf("day")
-        .subtract(30, "days")
+        .subtract(14, "days")
         .format("yyyy-MM-DD"),
       secondDate: moment().startOf("day").add(1, "days").format("yyyy-MM-DD"),
+      dateType: "finishedDate",
+      delivery: null,
     });
   }, []);
 
-  useEffect(() => {
-    if (deliveryDetailsModal === false) {
-      setDeliveryList([]);
+  const countableOptions = useMemo(() => {
+    return [
+      { id: 3, name: "Все" },
+      { id: 1, name: "Только те что входят в отчет" },
+      { id: 2, name: "Только те что не входят в отчет" },
+    ];
+  }, []);
+
+  const dateTypesOptions = useMemo(() => {
+    return [
+      {
+        name: "По завершенной дате",
+        id: 1,
+      },
+      {
+        name: "По дате выдачи",
+        id: 2,
+      },
+      {
+        name: "По дате отправления",
+        id: 3,
+      },
+      {
+        name: "По дате создания",
+        id: 4,
+      },
+    ];
+  }, []);
+
+  const dateTypes = useMemo(() => {
+    return {
+      1: "finisheddate",
+      2: "delivereddate",
+      3: "wentdate",
+      4: "creationdate",
+    };
+  }, []);
+
+  const filteredOrders = useMemo(() => {
+    try {
+      const temp = orders.filter((order) => {
+        return order.status === "finished" || order.status === "returned";
+      });
+      return temp;
+    } catch (e) {
+      console.log("Filter by Countable Error: ", e);
+      return [];
     }
-  }, [deliveryDetailsModal]);
+  }, [orders]);
+
+  const filteredOrdersByCountable = useMemo(() => {
+    try {
+      const temp = filteredOrders.filter((order) => {
+        const kaspiInfo = order?.kaspiinfo;
+        const kaspiInfoObject = kaspiInfo ? Object.keys(kaspiInfo) : [];
+        const isKaspi = kaspiInfoObject ? kaspiInfoObject.length > 0 : false;
+        if (countable === 3) {
+          return true;
+        }
+        if (countable === 2) {
+          return !(
+            (order.status === "finished" || order.status === "returned") &&
+            order.countable === 1 &&
+            !isKaspi
+          );
+        }
+        if (countable === 1) {
+          return (
+            (order.status === "finished" || order.status === "returned") &&
+            order.countable === 1 &&
+            !isKaspi
+          );
+        }
+        return true;
+      });
+      return temp;
+    } catch (e) {
+      console.log("Filter by Countable Error: ", e);
+      return [];
+    }
+  }, [filteredOrders, countable]);
+
+  const goodsTotal = useMemo(() => {
+    const goods = [];
+    filteredOrdersByCountable.forEach((order) => {
+      order.goods.forEach((good) => {
+        if (!goods[good.id]) {
+          goods[good.id] = {
+            id: good.id,
+            goodName: good.name,
+            sales: good.quantity,
+            sum: good.price * good.quantity,
+            profit: good.quantity * (good.price - good.purchase),
+          };
+          return;
+        }
+        goods[good.id].sales += good.quantity;
+        goods[good.id].sum += good.price * good.quantity;
+        goods[good.id].profit += good.quantity * (good.price - good.purchase);
+      });
+    });
+    const filteredFromEmpty = goods.filter((good) => {
+      if (!good) {
+        return false;
+      }
+      return true;
+    });
+    return filteredFromEmpty;
+  }, [filteredOrdersByCountable]);
+
+  const sortedGoods = useMemo(() => {
+    const sortedArray = [...goodsTotal].sort((a, b) => {
+      return b.profit - a.profit;
+    });
+    const biggestProfit = sortedArray[0]?.profit ? sortedArray[0]?.profit : 0;
+    let totalProfit = 0;
+    const arrayWithRating = sortedArray.map((item) => {
+      totalProfit += item.profit;
+      return { ...item, rating: (item.profit * 100) / biggestProfit };
+    });
+    let controlProfit = 0;
+    const arrayWithABC = arrayWithRating.map((item) => {
+      controlProfit += item.profit;
+      const percent = (controlProfit * 100) / totalProfit;
+      return { ...item, ABC: percent < 80 ? "A" : percent < 95 ? "B" : "C" };
+    });
+    return arrayWithABC;
+  }, [goodsTotal]);
+
+  const sortBySales = useMemo(() => {
+    if (sortType === 1) {
+      return sortedGoods;
+    }
+    const sortedArray = [...sortedGoods].sort((a, b) => {
+      return b.sales - a.sales;
+    });
+    return sortedArray;
+  }, [sortedGoods, sortType]);
 
   const handleUpdate = useCallback(() => {
-    getDeliveryLists({
-      setProcessLoading,
-      setData,
+    getFinishedOrders({
+      setFinishedOrdersLoading: setFetchLoading,
+      setFinishedOrders: setOrders,
       firstDate,
       secondDate,
+      dateType: dateTypes[dateType],
+      delivery: null,
+      next: () => {},
     });
-  }, [firstDate, secondDate]);
+  }, [firstDate, secondDate, dateTypes, dateType]);
 
   return (
     <div className="pageWrapper">
@@ -194,23 +249,30 @@ function ABC() {
             className={cl.SearchInput}
             type="date"
           />
-          <p>Курьер</p>
+          <p>По дате:</p>
           <Select
-            value={deliver}
-            setValue={setDeliver}
-            options={delivers}
-            style={{ margin: 0 }}
-            type="managers"
+            type="dateType"
+            options={dateTypesOptions}
+            setValue={setDateType}
+            value={dateType}
+            loading={fecthLoading}
+            style={{ margin: "10px 0" }}
           />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 10,
-            }}
-          >
+          <p>Отчет:</p>
+          <Select
+            value={countable}
+            options={countableOptions}
+            setValue={setCountable}
+            type={"pickup"}
+            style={{ margin: "10px 0" }}
+          />
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div></div>
-            <Button onClick={handleUpdate} text="Применить" />
+            <Button
+              disabled={fecthLoading}
+              onClick={handleUpdate}
+              text="Применить"
+            />
           </div>
         </div>
         <div className={cl.secondHalf}>
@@ -233,55 +295,148 @@ function ABC() {
               className={cl.SearchInput}
               type="date"
             />
-            <p>Курьер</p>
+            <p>По дате:</p>
             <Select
-              value={deliver}
-              setValue={setDeliver}
-              options={delivers}
-              style={{ margin: 0 }}
-              type="managers"
+              type="dateType"
+              options={dateTypesOptions}
+              setValue={setDateType}
+              value={dateType}
+              loading={fecthLoading}
+              style={{ margin: "10px 0" }}
             />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: 10,
-                marginBottom: 20,
-              }}
-            >
+            <p>Отчет:</p>
+            <Select
+              value={countable}
+              options={countableOptions}
+              setValue={setCountable}
+              type={"pickup"}
+              style={{ margin: "10px 0" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div></div>
               <Button onClick={handleUpdate} text="Применить" />
             </div>
           </div>
-          <div className={cl.tableWrapper}>
-            {processLoading ? (
-              <div className={cl.Center}>
-                <Loading which="gray" />
+          <SearchInput
+            placeholder="Поиск товара"
+            value={searchInput}
+            setValue={setSearchInput}
+            className={cl.SearchInput}
+          />
+          <div
+            className={cl.tableWrapper}
+            style={{ height: "inherit", margin: "15px 0", maxHeight: 1000 }}
+          >
+            {fecthLoading ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Loading />
               </div>
             ) : (
               <table>
                 <thead>
-                  <DeliveryHeaders />
+                  <tr>
+                    <th>№</th>
+                    <th>Товар</th>
+                    <th
+                      onClick={() => setSortType(2)}
+                      style={{
+                        backgroundColor: sortType === 2 ? "#eeee33" : "initial",
+                      }}
+                    >
+                      Количество продаж
+                    </th>
+                    <th>Выручка</th>
+                    <th
+                      onClick={() => setSortType(1)}
+                      style={{
+                        backgroundColor: sortType === 1 ? "#eeee33" : "initial",
+                      }}
+                    >
+                      Прибыль
+                    </th>
+                    <th>Рейтинг</th>
+                    <th>ABC</th>
+                  </tr>
                 </thead>
-                {filteredData.length === 0 ? (
+                {sortBySales.length === 0 ? (
                   <tbody style={{ width: "100%", textAlign: "center" }}>
                     <tr>
-                      <td colSpan={10}>Доставки не найдены</td>
+                      <td colSpan={10}>Ничего не найдено</td>
                     </tr>
                   </tbody>
                 ) : (
                   <tbody>
-                    {filteredData.map((delivery, index) => {
+                    {sortBySales.map((total, index) => {
                       return (
-                        <DeliveryRow
-                          key={delivery.id}
-                          delivery={delivery}
-                          index={index + 1}
-                          setDeliveryList={() => {
-                            setDeliveryList(delivery);
-                            setDeliveryDetailsModal(true);
+                        <tr
+                          key={total.id}
+                          style={{
+                            backgroundColor:
+                              total.ABC === "A"
+                                ? "#ccffcc"
+                                : total.ABC === "B"
+                                ? "#ffffcc"
+                                : "#ffe9e9",
                           }}
-                        />
+                        >
+                          <td
+                            style={{
+                              minWidth: "inherit",
+                              width: 40,
+                              maxWidth: 40,
+                              textAlign: "center",
+                            }}
+                          >
+                            {index + 1}
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.goodName}
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.sales} шт.
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.sum.toFixed(2)} ₸
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.profit.toFixed(2)} ₸
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.rating.toFixed(1)} %
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "center",
+                            }}
+                          >
+                            {total.ABC}
+                          </td>
+                        </tr>
                       );
                     })}
                   </tbody>
@@ -291,158 +446,6 @@ function ABC() {
           </div>
         </div>
       </div>
-      <Modal
-        modalVisible={deliveryDetailsModal}
-        setModalVisible={setDeliveryDetailsModal}
-        noEscape={processLoading}
-      >
-        <div
-          className={cl.tableWrapper}
-          style={{ height: "inherit", maxHeight: "50vh" }}
-        >
-          <table>
-            <thead>
-              <tr>
-                <th>№</th>
-                <th>Входит в отчет</th>
-                <th>Адрес</th>
-                <th>Товар</th>
-                <th>Статус</th>
-                <th>Стоимость доставки</th>
-                <th>Сумма заказа</th>
-                <th>Курьер принял</th>
-              </tr>
-            </thead>
-            <tbody>
-              {deliveryList?.deliveries?.length === 0 ? (
-                <tr>
-                  <td style={{ textAlign: "center" }} colSpan={1000 - 7}>
-                    Нет Доставок
-                  </td>
-                </tr>
-              ) : (
-                deliveryList?.deliveries?.map((item, index) => {
-                  return (
-                    <tr
-                      style={{
-                        backgroundColor:
-                          item.status === "cancelled" ? "#cd8faa" : "",
-                      }}
-                      key={item.id}
-                    >
-                      <td style={{ textAlign: "center" }}>{index + 1}</td>
-                      <td
-                        style={{
-                          textAlign: "center",
-                          width: "inherit",
-                          maxWidth: "inherit",
-                          minWidth: "50px",
-                        }}
-                      >
-                        {item.countable ? (
-                          <BiCheckCircle color="#47cc47" />
-                        ) : (
-                          <BsEyeSlashFill color="#cc4747" />
-                        )}
-                      </td>
-                      <td
-                        style={{
-                          width: "inherit",
-                          maxWidth: "inherit",
-                          minWidth: "100px",
-                        }}
-                      >
-                        {item.address}
-                      </td>
-                      <td
-                        style={{
-                          width: "inherit",
-                          maxWidth: "inherit",
-                          minWidth: "100px",
-                        }}
-                      >
-                        {item.goods}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        {statusesRussian[item.status]}
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        {item.deliveryPay}
-                        тг
-                      </td>
-                      <td style={{ textAlign: "center" }}>{item.sum} тг</td>
-                      <td style={{ textAlign: "center" }}>
-                        {item.paymentSum} тг
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td
-                  style={{
-                    textAlign: "center",
-                    width: "inherit",
-                    maxWidth: "inherit",
-                    minWidth: "50px",
-                  }}
-                >
-                  {deliveryList?.deliveries?.length -
-                    (payoffDeliveriesSum?.cancelledSum
-                      ? payoffDeliveriesSum.cancelledSum
-                      : 0)}{" "}
-                  шт.
-                </td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    width: "inherit",
-                    maxWidth: "inherit",
-                    minWidth: "50px",
-                  }}
-                >
-                  {payoffDeliveriesSum?.countableSum
-                    ? payoffDeliveriesSum.countableSum
-                    : 0}{" "}
-                  шт.
-                </td>
-                <td style={{ fontWeight: "bold" }} colSpan={3}>
-                  Всего:{" "}
-                  {isNaN(
-                    payoffDeliveriesSum?.paymentSums -
-                      payoffDeliveriesSum?.deliveryCosts
-                  )
-                    ? 0
-                    : payoffDeliveriesSum?.paymentSums -
-                      payoffDeliveriesSum?.deliveryCosts -
-                      parseInt(deliveryList?.cash ? deliveryList.cash : 0)}{" "}
-                  тг
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {payoffDeliveriesSum?.deliveryCosts
-                    ? payoffDeliveriesSum.deliveryCosts
-                    : 0}{" "}
-                  тг
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {payoffDeliveriesSum?.orderSums
-                    ? payoffDeliveriesSum.orderSums
-                    : 0}{" "}
-                  тг
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {payoffDeliveriesSum?.paymentSums
-                    ? payoffDeliveriesSum.paymentSums
-                    : 0}{" "}
-                  тг
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </Modal>
     </div>
   );
 }
