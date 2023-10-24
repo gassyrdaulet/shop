@@ -66,7 +66,7 @@ function OrderDetails() {
   const [recreateModal, setRecreateModal] = useState(false);
   const [returnModal, setReturnModal] = useState(false);
   const [editManagerModal, setEditManagerModal] = useState(false);
-  const [newManager, setNewManager] = useState(0);
+  const [newManager, setNewManager] = useState(-1);
   const [newDeliver, setNewDeliver] = useState(-1);
   const [managersLoading, setManagersLoading] = useState(true);
   const [deliver, setDeliver] = useState(-1);

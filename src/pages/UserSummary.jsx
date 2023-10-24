@@ -287,6 +287,16 @@ function UserSummary() {
               parseInt(good.quantity);
         orderSum += parseInt(good.price) * parseInt(good.quantity);
         purchaseSum += parseInt(good.purchase) * parseInt(good.quantity);
+        if (parseInt(good.purchase) < 10) {
+          console.log(
+            "Внимание! Найден товар с нулевым закупом:",
+            "#" + order.id,
+            good.price + "тг",
+            moment(order.creationdate).format("DD.MM.YYYY HH:mm"),
+            good.name,
+            good.id
+          );
+        }
       });
       sum = orderSum - discountSum;
       orderDiscountSum =
