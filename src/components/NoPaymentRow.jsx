@@ -7,7 +7,7 @@ function NoPaymentRow({
   setPayment,
   payment,
   editable = true,
-  setFocusedInput,
+  setFocusedInput = () => {},
   paymentMethods,
 }) {
   const deletePayment = () => {

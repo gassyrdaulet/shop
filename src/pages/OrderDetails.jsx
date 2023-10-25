@@ -227,9 +227,10 @@ function OrderDetails() {
 
   const roles = useMemo(() => {
     return {
-      deliver: "Курьеру",
+      deliver: "Курьеру наличку",
       manager: "Менеджеру",
       cashier: "Кассиру",
+      deliverremote: "Удаленно",
     };
   }, []);
 

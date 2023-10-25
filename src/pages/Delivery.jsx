@@ -480,7 +480,7 @@ function Delivery() {
           payment.forEach((item) => {
             if (item?.user === "deliver") {
               paymentSum += item.sum;
-            } else {
+            } else if (item?.user === "deliverremote") {
               otherPaymentSum += item.sum;
             }
           });
