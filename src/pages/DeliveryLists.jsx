@@ -90,6 +90,7 @@ function DeliveryLists() {
       return undefined;
     }
     let paymentSums = 0;
+    let otherPaymentSums = 0;
     let orderSums = 0;
     let deliveryCosts = 0;
     let countableSum = 0;
@@ -99,6 +100,7 @@ function DeliveryLists() {
         cancelledSum++;
         return;
       }
+      otherPaymentSums += parseInt(item.otherPaymentSums);
       paymentSums += parseInt(item.paymentSum);
       countableSum += item.countable ? 1 : 0;
       orderSums += parseInt(item.sum);
@@ -109,6 +111,7 @@ function DeliveryLists() {
       deliveryCosts,
       countableSum,
       paymentSums,
+      otherPaymentSums,
       cancelledSum,
     };
   }, [deliveryList]);
@@ -310,7 +313,8 @@ function DeliveryLists() {
                 <th>Статус</th>
                 <th>Стоимость доставки</th>
                 <th>Сумма заказа</th>
-                <th>Курьер принял</th>
+                <th>Курьер принял налички</th>
+                <th>Курьер принял удаленно</th>
               </tr>
             </thead>
             <tbody>
@@ -374,6 +378,9 @@ function DeliveryLists() {
                       <td style={{ textAlign: "center" }}>
                         {item.paymentSum} тг
                       </td>
+                      <td style={{ textAlign: "center" }}>
+                        {item.otherPaymentSum} тг
+                      </td>
                     </tr>
                   );
                 })
@@ -435,6 +442,12 @@ function DeliveryLists() {
                 <td style={{ textAlign: "center" }}>
                   {payoffDeliveriesSum?.paymentSums
                     ? payoffDeliveriesSum.paymentSums
+                    : 0}{" "}
+                  тг
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  {payoffDeliveriesSum?.otherPaymentSums
+                    ? payoffDeliveriesSum.otherPaymentSums
                     : 0}{" "}
                   тг
                 </td>

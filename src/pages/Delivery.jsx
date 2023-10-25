@@ -476,9 +476,12 @@ function Delivery() {
         if (order.id === parseInt(id)) {
           const { goods, deliveryinfo, discount, payment } = order;
           let paymentSum = 0;
+          let otherPaymentSum = 0;
           payment.forEach((item) => {
             if (item?.user === "deliver") {
               paymentSum += item.sum;
+            } else {
+              otherPaymentSum += item.sum;
             }
           });
           let sum = 0;
@@ -505,7 +508,8 @@ function Delivery() {
             address: order.deliveryinfo.address,
             deliveryPay: order.deliveryinfo.deliveryPriceForDeliver,
             sum: sumWithDiscount,
-            paymentSum: paymentSum,
+            paymentSum,
+            otherPaymentSum,
             status: order.status,
             goods: goodsParsed,
             countable: order.countable === 1,
@@ -525,12 +529,14 @@ function Delivery() {
     let deliveryCosts = 0;
     let countableSum = 0;
     let cancelledSum = 0;
+    let otherPaymentSums = 0;
     payoffDeliveriesList.forEach((item) => {
       if (item.status === "cancelled") {
         cancelledSum++;
         return;
       }
       paymentSums += parseInt(item.paymentSum);
+      otherPaymentSums += parseInt(item.otherPaymentSum);
       countableSum += item.countable ? 1 : 0;
       orderSums += parseInt(item.sum);
       deliveryCosts += parseInt(item.deliveryPay);
@@ -539,6 +545,7 @@ function Delivery() {
       orderSums,
       deliveryCosts,
       countableSum,
+      otherPaymentSums,
       paymentSums,
       cancelledSum,
     };
@@ -854,7 +861,8 @@ function Delivery() {
                 <th>Статус</th>
                 <th>Стоимость доставки</th>
                 <th>Сумма заказа</th>
-                <th>Курьер принял</th>
+                <th>Курьер принял налички</th>
+                <th>Курьер принял удаленно</th>
               </tr>
             </thead>
             <tbody>
@@ -931,6 +939,9 @@ function Delivery() {
                       <td style={{ textAlign: "center" }}>
                         {item.paymentSum} тг
                       </td>
+                      <td style={{ textAlign: "center" }}>
+                        {item.otherPaymentSum} тг
+                      </td>
                     </tr>
                   );
                 })
@@ -992,6 +1003,12 @@ function Delivery() {
                 <td style={{ textAlign: "center" }}>
                   {payoffDeliveriesSum?.paymentSums
                     ? payoffDeliveriesSum.paymentSums
+                    : 0}{" "}
+                  тг
+                </td>
+                <td style={{ textAlign: "center" }}>
+                  {payoffDeliveriesSum?.otherPaymentSums
+                    ? payoffDeliveriesSum.otherPaymentSums
                     : 0}{" "}
                   тг
                 </td>
