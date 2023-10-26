@@ -382,7 +382,7 @@ function UserSummary() {
       let returnedOrders = 0;
       day.orders.forEach((order) => {
         const { status } = order;
-        if ((status === "returned") === 0) {
+        if (status === "returned") {
           returnedOrders++;
         }
         let orderSum = 0;
