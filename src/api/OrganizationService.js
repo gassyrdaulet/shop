@@ -319,11 +319,17 @@ export const getManagersForSummary = async ({
           ...managers,
         ]);
       } else {
-        setManagers(
-          [requesterRoles].map((item) => {
-            return { value: item.id, name: item.name, id: item.id };
-          })
-        );
+        setManagers([
+          { value: -2, name: "Все", id: -2 },
+          { value: -1, name: "Магазин", id: -1 },
+          ...[requesterRoles].map((item) => {
+            return {
+              value: item.id,
+              name: item.name,
+              id: item.id,
+            };
+          }),
+        ]);
       }
     })
     .catch((err) => {

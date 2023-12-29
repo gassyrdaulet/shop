@@ -3,7 +3,7 @@ import { BsEye } from "react-icons/bs";
 import { useMemo } from "react";
 import cl from "../styles/Goods.module.css";
 
-function SpendingRow({ cashbox, index, onClick }) {
+function CashboxesRow({ cashbox, index, onClick }) {
   const sum = useMemo(() => {
     try {
       if (!cashbox?.cash) {
@@ -45,7 +45,7 @@ function SpendingRow({ cashbox, index, onClick }) {
       <td style={{ textAlign: "center" }}>
         {cashbox.username + ` (ID: ${cashbox.responsible})`}
       </td>
-      <td>{sum.toFixed(2)} тг.</td>
+      <td>{(isNaN(parseInt(sum)) ? 0 : parseInt(sum)).toFixed(2)} тг.</td>
       <td>
         <div className={cl.MoreButtonWrapper} onClick={onClick}>
           <div className={cl.MoreButton}>
@@ -57,4 +57,4 @@ function SpendingRow({ cashbox, index, onClick }) {
   );
 }
 
-export default SpendingRow;
+export default CashboxesRow;
