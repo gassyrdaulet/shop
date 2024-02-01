@@ -249,7 +249,7 @@
   padding-bottom: 20px;
 }
 .tableWrapper thead {
-  user-select: none;
+  /* user-select: none; */
   position: sticky;
   top: -1px;
   z-index: 25;

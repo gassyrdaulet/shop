@@ -480,7 +480,7 @@ function OrderDetails() {
       },
     },
     {
-      show: data.status === "awaiting",
+      show: data.status === "awaiting" || data.status === "processing",
       disabled: processLoading,
       icon: <BsPencil />,
       text: "Редактировать",
